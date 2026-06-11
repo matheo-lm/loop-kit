@@ -23,9 +23,189 @@ write_if_missing() {
   fi
 }
 
-# ── 1. AGENTS.md — operating model ───────────────────────────────────
+# ── 1. SESSION.md — session-start prompt ────────────────────────────
+write_if_missing "SESSION.md" \
+'# Session start
+
+Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
+
+Then read `STATE.md` and `docs/soul.md` to understand current state and priorities.
+
+---
+
+# Objective
+
+Deliver one complete item from `docs/soul.md` and leave it in a merge-ready state.
+
+Optimize for the highest-impact user-facing outcome. If no items are clear, audit the codebase and populate `docs/soul.md` with findings.
+
+---
+
+# Operating Loop
+
+Remain in the following loop until exit criteria are satisfied.
+
+## Phase 1: Gather Evidence
+
+Before proposing work:
+
+1. Read:
+   - `AGENTS.md`
+   - `STATE.md`
+   - `docs/soul.md`
+   - `docs/done_soul.md`
+
+2. Refresh repository state:
+   - `git pull origin <branch>`
+   - Verify task metadata against actual code state
+
+3. Treat all task metadata as potentially stale. Never trust status fields, dependency declarations, or implementation assumptions until verified in code.
+
+---
+
+## Phase 2: Build Candidates
+
+Identify the top candidate items from `docs/soul.md`.
+
+For each candidate, note:
+- user-facing impact
+- dependencies
+- risk level
+- affected files
+- verification scope
+
+Rank by:
+1. User impact
+2. Priority/severity
+3. Readiness (dependencies met, blocked on nothing)
+4. Implementation efficiency
+
+Explicitly state why lower-ranked candidates were rejected.
+
+---
+
+## Phase 3: Commit to One Item
+
+Before coding, present:
+
+### Selected Item
+- what it is
+- rationale for selection
+- dependencies verified
+- files expected to change
+
+### Out of Scope
+List what will not be touched.
+
+### Acceptance Criteria
+For the item:
+- required behavior
+- tests required (if any)
+- verification required
+
+If work touches:
+- payments/billing
+- auth/access control
+- data deletion
+- irreversible public behavior
+
+STOP and request approval. Otherwise proceed.
+
+---
+
+## Phase 4: Implement
+
+Work incrementally. After each meaningful change:
+1. Re-read affected code.
+2. Verify assumptions still hold.
+3. Update plan if new evidence appears.
+4. Avoid broad refactors.
+
+Prefer the smallest change that satisfies acceptance criteria.
+
+---
+
+## Phase 5: Reality Check
+
+After implementation:
+
+### Verify
+Run the project'\''s validation:
+- touched unit tests
+- typecheck
+- lint
+- build (when applicable)
+
+Do not fix unrelated failures.
+
+### Evaluate
+Ask:
+- Did the change satisfy the acceptance criteria?
+- Did it introduce new work?
+- Did it invalidate remaining items?
+
+If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers and exit.
+
+---
+
+# Non-Negotiable Rules
+
+- Never commit directly to `main`. Use a feature branch.
+- Never merge without approval.
+- No emoji in product UI.
+- Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven).
+- No refactoring beyond what the selected item requires.
+- When modifying API behavior, update `.env.example`, docs, and README.
+
+---
+
+# Bookkeeping
+
+When an item is complete:
+1. Move it from `docs/soul.md` to `docs/done_soul.md`
+2. Preserve all content — add completion date and implementation notes
+3. Never delete items; always move
+
+If new work is discovered:
+- Add it to `docs/soul.md` with severity and location
+- Never leave findings only in conversation
+
+---
+
+# Exit Criteria
+
+Do not declare success until ALL are true:
+- acceptance criteria satisfied
+- dependencies verified
+- validation passing (typecheck, lint, tests)
+- no new work left undocumented
+- bookkeeping updated
+- feature branch pushed
+- remaining risks documented in `STATE.md`
+
+If any criterion is unmet, continue the loop.
+'
+
+# ── 2. docs/done_soul.md — completed items ───────────────────────────
+write_if_missing "docs/done_soul.md" \
+'# done soul
+
+completed items from `docs/soul.md`. nothing is deleted — only moved here.
+
+**read this to avoid re-fixing what'\''s already fixed.**
+
+---
+
+| date completed | area | original item | notes |
+|----------------|------|---------------|-------|
+| yyyy-mm-dd | ux/ui | item text | implementation notes |
+'
+
+# ── 3. AGENTS.md — operating model ───────────────────────────────────
 write_if_missing "AGENTS.md" \
 '# Repository Guidelines
+
+Read `SESSION.md` before starting a session. It defines the operating loop.
 
 ## Operating Principles
 
@@ -86,17 +266,18 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting. Findings land in STATE.md for the next agent session.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don'\''t collide.
 
-### How To Operate Each Session
+### Session Ritual
 
-1. **Sync**: `git pull origin <branch>` to synchronize with remote.
-2. **Start**: Read `STATE.md`. Understand what'\''s in progress, what'\''s blocked, what'\''s next.
-3. **Plan**: State your assumptions. List steps with verification criteria (Operating Principle 4).
-4. **Execute**: Surgical, simple changes (Principles 2 & 3). Match existing patterns exactly.
-5. **Verify**: Run `<your typecheck command> && <your lint command> && <your test command>`.
-6. **Record**: Update `STATE.md` — what was done, what'\''s next, any findings or blockers.
-7. **Commit**: Stage only intended files. Conventional commit message (`feat:`, `fix:`, `chore:`).
-8. **Push**: `git push origin <branch>` to deploy changes.
-9. **Loop**: If the goal isn'\''t met, return to step 2. If blocked, be explicit about what'\''s needed.
+Follow the phased operating loop in `SESSION.md` — it is the canonical session protocol.
+
+In summary:
+1. **Sync**: `git pull origin <branch>`.
+2. **Start**: Read `STATE.md`, `docs/soul.md`, `docs/done_soul.md`.
+3. **Phase 1-3**: Gather evidence, build candidates, commit to one item.
+4. **Phase 4-5**: Implement, verify, evaluate.
+5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/soul.md` to `docs/done_soul.md`.
+6. **Commit + push**: Feature branch, conventional commit.
+7. **Loop**: If exit criteria not met, return to step 2.
 
 ---
 
@@ -116,7 +297,7 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 <!-- TODO: describe commit message format, PR process -->
 '
 
-# ── 2. STATE.md — session memory ────────────────────────────────────
+# ── 4. STATE.md — session memory ────────────────────────────────────
 write_if_missing "STATE.md" \
 '# state
 > last updated: <date>
@@ -146,7 +327,7 @@ write_if_missing "STATE.md" \
 | yyyy-mm-dd | <done> | <next> |
 '
 
-# ── 3. SKILL.md — disciplined coding ────────────────────────────────
+# ── 5. SKILL.md — disciplined coding ────────────────────────────────
 write_if_missing "SKILL.md" \
 '# disciplined-coding
 
@@ -179,7 +360,7 @@ For any multi-step change, structure your plan as:
 ```
 '
 
-# ── 4. Sub-agents ────────────────────────────────────────────────────
+# ── 6. Sub-agents ────────────────────────────────────────────────────
 write_if_missing ".opencode/agents/reviewer.md" \
 '# reviewer
 
@@ -217,7 +398,7 @@ Security audit sub-agent for changes touching auth, APIs, or user input.
 - **blocked**: must-fix issue with file:line and remediation
 '
 
-# ── 5. docs/soul.md — quality gap tracker ────────────────────────────
+# ── 7. docs/soul.md — quality gap tracker ────────────────────────────
 write_if_missing "docs/soul.md" \
 '# soul
 
@@ -260,7 +441,7 @@ we know about. nothing here gets deleted — only moved to done when fixed.
 | **total** | **0** |
 '
 
-# ── 6. Starter skills ────────────────────────────────────────────────
+# ── 8. Starter skills ────────────────────────────────────────────────
 write_if_missing "templates/skills/design/SKILL.md" \
 '# design
 
@@ -307,7 +488,7 @@ Before coding, understand the context and commit to a clear aesthetic direction:
 - Trend-driven aesthetics (glassmorphism, neubrutalism)
 '
 
-# ── 7. .gitignore ─────────────────────────────────────────────────────
+# ── 9. .gitignore ─────────────────────────────────────────────────────
 write_if_missing ".gitignore" \
 'node_modules/
 dist/
@@ -319,11 +500,24 @@ dist/
 echo ""
 echo "=== loop-kit: bootstrapped $TARGET ==="
 echo ""
+echo "Generated files:"
+echo "  SESSION.md      ← session-start prompt (give this to your agent)"
+echo "  AGENTS.md       ← operating model + principles (fill in <!-- TODO -->)"
+echo "  STATE.md        ← session memory"
+echo "  SKILL.md        ← disciplined coding"
+echo "  docs/soul.md    ← quality gap tracker"
+echo "  docs/done_soul.md ← completed items"
+echo "  .opencode/agents/reviewer.md"
+echo "  .opencode/agents/security-auditor.md"
+echo ""
 echo "Next steps:"
-echo "  1. Edit AGENTS.md — fill in <!-- TODO --> placeholders with your project details"
+echo "  1. Edit AGENTS.md — fill in <!-- TODO --> placeholders"
 echo "  2. Populate docs/soul.md by auditing your codebase"
 echo "  3. Add project-specific skills under templates/skills/<name>/SKILL.md"
 echo "  4. Add automations under .github/workflows/ as needed"
-echo "  5. Commit: git add . && git commit -m '\''feat: establish loop engineering operating model'\''"
+echo "  5. Commit: git add . && git commit -m 'feat: establish loop engineering operating model'"
 echo ""
-echo "The loop is ready. Next session starts with: git pull && cat STATE.md"
+echo "The loop is ready. Next session:"
+echo "  1. Give SESSION.md to your agent as the session-start prompt"
+echo "  2. The agent reads STATE.md + soul.md and starts the operating loop"
+echo "  3. After session: agent updates STATE.md and commits"

@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+Read `SESSION.md` before starting a session. It defines the operating loop.
+
 ## Operating Principles
 
 These principles govern every agent interaction. Read them first. Apply them always.
@@ -54,17 +56,18 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
 
-### How To Operate Each Session
+### Session Ritual
 
-1. **Sync**: `git pull origin <branch>` to synchronize with remote.
-2. **Start**: Read `STATE.md`. Understand what's in progress, what's blocked, what's next.
-3. **Plan**: State your assumptions. List steps with verification criteria.
-4. **Execute**: Surgical, simple changes. Match existing patterns exactly.
-5. **Verify**: Run `<typecheck> && <lint> && <test>`.
-6. **Record**: Update `STATE.md`.
-7. **Commit**: Conventional commit message (`feat:`, `fix:`, `chore:`).
-8. **Push**: `git push origin <branch>`.
-9. **Loop**: If the goal isn't met, return to step 2.
+Follow the phased operating loop in `SESSION.md` — it is the canonical session protocol.
+
+In summary:
+1. **Sync**: `git pull origin <branch>`.
+2. **Start**: Read `STATE.md`, `docs/soul.md`, `docs/done_soul.md`.
+3. **Phase 1-3**: Gather evidence, build candidates, commit to one item.
+4. **Phase 4-5**: Implement, verify, evaluate.
+5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/soul.md` to `docs/done_soul.md`.
+6. **Commit + push**: Feature branch, conventional commit.
+7. **Loop**: If exit criteria not met, return to step 2.
 
 ---
 
