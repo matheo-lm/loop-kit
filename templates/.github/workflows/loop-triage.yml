@@ -1,0 +1,36 @@
+name: loop-triage
+
+# Scheduled discovery: surfaces open laundry-list items as a recurring triage
+# issue so the loop has fresh input without human prompting.
+# Manual-only by default — uncomment the schedule block to enable the cron
+# once your laundry list is trustworthy.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 6 * * 1" # Mondays 06:00 UTC
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open or update the triage issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open_items="$(grep -n '^- \[ \]' docs/laundry_list.md || true)"
+          if [ -z "$open_items" ]; then
+            open_items="(none - populate docs/laundry_list.md)"
+          fi
+          title="loop-triage: open laundry list items"
+          body="$(printf 'Open items in docs/laundry_list.md as of %s:\n\n```\n%s\n```' "$(date -u +%F)" "$open_items")"
+          existing="$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

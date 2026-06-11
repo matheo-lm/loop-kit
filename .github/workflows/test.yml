@@ -30,9 +30,37 @@ jobs:
           test -f SESSION.md || { echo "missing SESSION.md"; exit 1; }
           test -f AGENTS.md || { echo "missing AGENTS.md"; exit 1; }
           test -f STATE.md || { echo "missing STATE.md"; exit 1; }
-          test -f SKILL.md || { echo "missing SKILL.md"; exit 1; }
-          test -f docs/soul.md || { echo "missing docs/soul.md"; exit 1; }
-          test -f docs/done_soul.md || { echo "missing done_soul.md"; exit 1; }
+          test -f docs/laundry_list.md || { echo "missing docs/laundry_list.md"; exit 1; }
+          test -f docs/done_laundry_list.md || { echo "missing done_laundry_list.md"; exit 1; }
+          test -f skills/disciplined-coding/SKILL.md || { echo "missing disciplined-coding skill"; exit 1; }
+          test -f skills/design/SKILL.md || { echo "missing design skill"; exit 1; }
           test -f .agents/reviewer.md || { echo "missing reviewer"; exit 1; }
           test -f .agents/security-auditor.md || { echo "missing security-auditor"; exit 1; }
+          test -f .github/workflows/loop-triage.yml || { echo "missing loop-triage workflow"; exit 1; }
+          # regression: the kit must never leak its own templates/ layout into targets
+          test ! -d templates || { echo "stray templates/ dir created in target"; exit 1; }
+          # skills must carry discoverable frontmatter
+          head -1 skills/disciplined-coding/SKILL.md | grep -q '^---$' || { echo "disciplined-coding missing frontmatter"; exit 1; }
+          head -1 skills/design/SKILL.md | grep -q '^---$' || { echo "design missing frontmatter"; exit 1; }
           echo "All files present. Bootstrap test passed."
+
+  templates-in-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap and diff against templates/
+        run: |
+          mkdir /tmp/sync-check
+          cd /tmp/sync-check
+          git init -q
+          bash "${{ github.workspace }}/scripts/loop-init.sh" . > /dev/null
+          cd "${{ github.workspace }}/templates"
+          fail=0
+          while IFS= read -r -d '' tmpl; do
+            rel="${tmpl#./}"
+            if ! diff -u "$tmpl" "/tmp/sync-check/$rel"; then
+              echo "OUT OF SYNC: templates/$rel differs from init script output"
+              fail=1
+            fi
+          done < <(find . -type f -print0)
+          exit "$fail"
