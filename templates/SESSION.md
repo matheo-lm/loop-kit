@@ -126,6 +126,7 @@ Do not fix unrelated failures.
 The work is graded by a pass that did not write it:
 - Dispatch `.agents/reviewer.md` as a sub-agent to review the diff against the acceptance criteria. If your tool has no sub-agents, re-read the full diff cold against the criteria before declaring done.
 - If the change touched auth, API surfaces, or user input handling, also run `.agents/security-auditor.md`.
+- If the change touched user-facing UI, evaluate the changed screens against `skills/usability-heuristics/SKILL.md` — findings of severity 3+ block the ship.
 - Address "changes requested" and "blocked" findings before shipping. Findings are inputs, not truth — the primary agent owns consolidation.
 
 ### Evaluate

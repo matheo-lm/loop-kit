@@ -27,7 +27,13 @@ Skills live in `templates/skills/<name>/SKILL.md`. They should be:
 
 ### Init script
 
-`scripts/loop-init.sh` is a single portable bash script. No dependencies beyond `curl` and `mkdir`. Run `shellcheck` on changes.
+`scripts/loop-init.sh` is a single portable bash script, **generated** from `templates/` by `scripts/build-init.sh` — never edit it by hand. After changing anything under `templates/`, run:
+
+```bash
+./scripts/build-init.sh
+```
+
+CI (`templates-in-sync`) fails if the generated script and `templates/` drift. No runtime dependencies beyond `curl` and `mkdir`. Run `shellcheck` on changes.
 
 ## PR process
 

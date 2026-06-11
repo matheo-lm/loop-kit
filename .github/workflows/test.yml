@@ -34,6 +34,10 @@ jobs:
           test -f docs/done_laundry_list.md || { echo "missing done_laundry_list.md"; exit 1; }
           test -f skills/disciplined-coding/SKILL.md || { echo "missing disciplined-coding skill"; exit 1; }
           test -f skills/design/SKILL.md || { echo "missing design skill"; exit 1; }
+          test -f skills/usability-heuristics/SKILL.md || { echo "missing usability-heuristics skill"; exit 1; }
+          # Claude Code discovery symlinks must exist and resolve
+          test -L .claude/skills/design || { echo "missing .claude/skills symlink"; exit 1; }
+          test -f .claude/skills/usability-heuristics/SKILL.md || { echo ".claude/skills symlink does not resolve"; exit 1; }
           test -f .agents/reviewer.md || { echo "missing reviewer"; exit 1; }
           test -f .agents/security-auditor.md || { echo "missing security-auditor"; exit 1; }
           test -f .github/workflows/loop-triage.yml || { echo "missing loop-triage workflow"; exit 1; }
