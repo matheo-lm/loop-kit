@@ -1,7 +1,11 @@
+---
+name: design
+description: Use when building or refining UI components, pages, or visual design.
+---
+
 # design
 
 Frontend design guidelines adapted from Anthropic's frontend-design skill.
-Use when building or refining UI components, pages, or visual design.
 
 ## when to use
 - building or restyling any component

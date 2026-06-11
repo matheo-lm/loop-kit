@@ -1,6 +1,6 @@
-# done soul
+# done laundry list
 
-completed items from `docs/soul.md`. nothing is deleted — only moved here.
+completed items from `docs/laundry_list.md`. nothing is deleted — only moved here.
 
 **read this to avoid re-fixing what's already fixed.**
 

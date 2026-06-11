@@ -2,6 +2,8 @@
 # loop-init.sh — bootstrap loop engineering into any codebase
 # Usage: curl -fsSL https://raw.githubusercontent.com/matheo-lm/loop-kit/main/scripts/loop-init.sh | bash
 #   or:  ./loop-init.sh /path/to/project
+#
+# NOTE: the file blocks below mirror templates/ — keep them in sync.
 
 set -euo pipefail
 
@@ -24,21 +26,32 @@ write_if_missing() {
   fi
 }
 
-# ── 1. SESSION.md — session-start prompt ────────────────────────────
-write_if_missing "SESSION.md" << 'EOF'
+# ── 1. SESSION.md — session-start prompt ─────────────────────────────
+write_if_missing "SESSION.md" << 'TEMPLATE_EOF'
 # Session start
 
 Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
 
-Then read `STATE.md` and `docs/soul.md` to understand current state and priorities.
+Then read `STATE.md` and `docs/laundry_list.md` to understand current state and priorities.
 
 ---
 
 # Objective
 
-Deliver one complete item from `docs/soul.md` and leave it in a merge-ready state.
+Deliver one complete item from `docs/laundry_list.md` and leave it in a merge-ready state.
 
-Optimize for the highest-impact user-facing outcome. If no items are clear, audit the codebase and populate `docs/soul.md` with findings.
+Optimize for the highest-impact user-facing outcome. If no items are clear, audit the codebase and populate `docs/laundry_list.md` with findings.
+
+---
+
+# The Two Human Gates
+
+The human engineers the loop; the loop runs the work. The human is involved at exactly two points:
+
+1. **Frame gate** (end of Phase 3) — if the selected item is ambiguous, has multiple valid interpretations, or touches the STOP list, ask before writing code. Questions before work are cheap; questions after mistakes are expensive.
+2. **Ship gate** (the PR) — the human reviews finished, verified work with evidence attached.
+
+Between the gates, run to completion. Do not stop to ask "shall I proceed?", present intermediate artifacts for sign-off, or request permission between phases. Once framing is settled, it converts into acceptance criteria and the loop runs autonomously through implement → verify → ship. The only legitimate mid-loop stop is being blocked on input only the human has.
 
 ---
 
@@ -53,8 +66,8 @@ Before proposing work:
 1. Read:
    - `AGENTS.md`
    - `STATE.md`
-   - `docs/soul.md`
-   - `docs/done_soul.md`
+   - `docs/laundry_list.md`
+   - `docs/done_laundry_list.md`
 
 2. Refresh repository state:
    - `git pull origin <branch>`
@@ -66,7 +79,7 @@ Before proposing work:
 
 ## Phase 2: Build Candidates
 
-Identify the top candidate items from `docs/soul.md`.
+Identify the top candidate items from `docs/laundry_list.md`.
 
 For each candidate, note:
 - user-facing impact
@@ -87,7 +100,7 @@ Explicitly state why lower-ranked candidates were rejected.
 
 ## Phase 3: Commit to One Item
 
-Before coding, present:
+Before coding, record:
 
 ### Selected Item
 - what it is
@@ -104,13 +117,13 @@ For the item:
 - tests required (if any)
 - verification required
 
-If work touches:
+This is the Frame gate. If work touches:
 - payments/billing
 - auth/access control
 - data deletion
 - irreversible public behavior
 
-STOP and request approval. Otherwise proceed.
+STOP and request approval. Likewise ask now if the item is ambiguous or has multiple valid interpretations. Otherwise proceed — no further check-ins until the PR.
 
 ---
 
@@ -139,6 +152,12 @@ Run the project's validation:
 
 Do not fix unrelated failures.
 
+### Review (maker ≠ checker)
+The work is graded by a pass that did not write it:
+- Dispatch `.agents/reviewer.md` as a sub-agent to review the diff against the acceptance criteria. If your tool has no sub-agents, re-read the full diff cold against the criteria before declaring done.
+- If the change touched auth, API surfaces, or user input handling, also run `.agents/security-auditor.md`.
+- Address "changes requested" and "blocked" findings before shipping. Findings are inputs, not truth — the primary agent owns consolidation.
+
 ### Evaluate
 Ask:
 - Did the change satisfy the acceptance criteria?
@@ -153,8 +172,7 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 
 - Never commit directly to `main`. Use a feature branch.
 - Never merge without approval.
-- No emoji in product UI.
-- Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven).
+- Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven) and project conventions.
 - No refactoring beyond what the selected item requires.
 - When modifying API behavior, update `.env.example`, docs, and README.
 
@@ -163,13 +181,24 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 # Bookkeeping
 
 When an item is complete:
-1. Move it from `docs/soul.md` to `docs/done_soul.md`
+1. Move it from `docs/laundry_list.md` to `docs/done_laundry_list.md`
 2. Preserve all content — add completion date and implementation notes
 3. Never delete items; always move
 
 If new work is discovered:
-- Add it to `docs/soul.md` with severity and location
+- Add it to `docs/laundry_list.md` with severity and location
 - Never leave findings only in conversation
+
+---
+
+# Ship
+
+Open a pull request (the Ship gate):
+- Concise summary of what changed and why.
+- Verification evidence in the body — the commands you ran and their output, not assertions.
+- If anything failed or was skipped, say so plainly.
+
+The human reviews the finished PR, not intermediate artifacts.
 
 ---
 
@@ -179,31 +208,17 @@ Do not declare success until ALL are true:
 - acceptance criteria satisfied
 - dependencies verified
 - validation passing (typecheck, lint, tests)
+- reviewer findings addressed
 - no new work left undocumented
 - bookkeeping updated
-- feature branch pushed
+- feature branch pushed and PR opened with verification evidence in the body
 - remaining risks documented in `STATE.md`
 
 If any criterion is unmet, continue the loop.
-EOF
+TEMPLATE_EOF
 
-# ── 2. docs/done_soul.md — completed items ───────────────────────────
-write_if_missing "docs/done_soul.md" << 'EOF'
-# done soul
-
-completed items from `docs/soul.md`. nothing is deleted — only moved here.
-
-**read this to avoid re-fixing what's already fixed.**
-
----
-
-| date completed | area | original item | notes |
-|----------------|------|---------------|-------|
-| yyyy-mm-dd | ux/ui | item text | implementation notes |
-EOF
-
-# ── 3. AGENTS.md — operating model ───────────────────────────────────
-write_if_missing "AGENTS.md" << 'EOF'
+# ── 2. AGENTS.md — operating model ─────────────────────────────
+write_if_missing "AGENTS.md" << 'TEMPLATE_EOF'
 # Repository Guidelines
 
 Read `SESSION.md` before starting a session. It defines the operating loop.
@@ -261,11 +276,15 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 
 ### The Five Pieces
 
-1. **Memory** — `STATE.md` tracks what's done, what's next, and open blockers. The agent reads this at session start and writes to it at session end. The model forgets; the repo doesn't.
-2. **Skills** — `SKILL.md` files codify project knowledge so every agent doesn't re-derive it from zero. Conventions, build steps, rationale — written once, read every run.
-3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/`. The agent that writes is never the sole agent that grades.
-4. **Automations** — Scheduled workflows run discovery and triage without human prompting. Findings land in STATE.md for the next agent session.
+1. **Memory** — `STATE.md` tracks the current goal and blockers; `docs/laundry_list.md` is the ranked backlog and `docs/done_laundry_list.md` the archive. The agent reads them at session start and writes at session end. The model forgets; the repo doesn't.
+2. **Skills** — `skills/<name>/SKILL.md` files codify project knowledge so every agent doesn't re-derive it from zero. Conventions, build steps, rationale — written once, read every run. Each skill carries YAML frontmatter (`name`, `description`) so agent tools can discover it; for Claude Code, symlink skills into `.claude/skills/` (`ln -s ../../skills/<name> .claude/skills/<name>`).
+3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/` (agent-agnostic; for Claude Code, copy or symlink into `.claude/agents/`). The agent that writes is never the sole agent that grades.
+4. **Automations** — Scheduled workflows run discovery and triage without human prompting. `.github/workflows/loop-triage.yml` surfaces open laundry-list items as a recurring issue; enable its cron when the list is trustworthy.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
+
+### The Two Human Gates
+
+The human engineers the loop, not its per-cycle prompter. Exactly two gates: **Frame** (clarifying questions before code, when ambiguous or on the STOP list) and **Ship** (the PR, with verification evidence). Between them, run to completion — `SESSION.md` defines both gates.
 
 ### Session Ritual
 
@@ -273,12 +292,29 @@ Follow the phased operating loop in `SESSION.md` — it is the canonical session
 
 In summary:
 1. **Sync**: `git pull origin <branch>`.
-2. **Start**: Read `STATE.md`, `docs/soul.md`, `docs/done_soul.md`.
-3. **Phase 1-3**: Gather evidence, build candidates, commit to one item.
-4. **Phase 4-5**: Implement, verify, evaluate.
-5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/soul.md` to `docs/done_soul.md`.
-6. **Commit + push**: Feature branch, conventional commit.
+2. **Start**: Read `STATE.md`, `docs/laundry_list.md`, `docs/done_laundry_list.md`.
+3. **Phase 1-3**: Gather evidence, build candidates, commit to one item (Frame gate).
+4. **Phase 4-5**: Implement, verify, review, evaluate.
+5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/laundry_list.md` to `docs/done_laundry_list.md`.
+6. **Ship**: Feature branch, conventional commit, PR with verification evidence (Ship gate).
 7. **Loop**: If exit criteria not met, return to step 2.
+
+### Red Flags
+
+These thoughts mean stop — you're rationalizing:
+
+| Thought | Reality |
+|---------|---------|
+| "This is too simple to need acceptance criteria" | Simple items with unexamined assumptions are where rework comes from. Two lines is enough. |
+| "I'll just fix this adjacent thing while I'm here" | Scope creep breaks surgical changes. Add it to `docs/laundry_list.md` instead. |
+| "Tests probably pass" / "this should work now" | Evidence before claims. Run them. |
+| "I'll check with the human if this looks good so far" | Mid-loop permission-seeking re-inserts the human into the cycle. Verify against the criteria and ship. |
+| "The status says done, so it's done" | Statuses go stale. Verify against the code. |
+| "I'll update the docs in a follow-up" | The follow-up never comes. Same change, same PR. |
+
+### Comprehension Debt
+
+Loop velocity must not outpace understanding. The human reads the diffs; the agent writes PR descriptions that make the diff comprehensible — what changed, why, and what was verified. If a change can't be explained plainly in the PR body, it isn't ready to ship.
 
 ---
 
@@ -289,17 +325,17 @@ In summary:
 <!-- TODO: list your build, dev, test, typecheck, lint commands here -->
 
 ## Coding Style & Naming Conventions
-<!-- TODO: describe your naming conventions and style rules -->
+<!-- TODO: describe your naming conventions and style rules (e.g., "no emoji in product UI") -->
 
 ## Testing Guidelines
 <!-- TODO: describe testing approach, test runner, coverage expectations -->
 
 ## Commit & Pull Request Guidelines
 <!-- TODO: describe commit message format, PR process -->
-EOF
+TEMPLATE_EOF
 
-# ── 4. STATE.md — session memory ────────────────────────────────────
-write_if_missing "STATE.md" << 'EOF'
+# ── 3. STATE.md — session memory ─────────────────────────────
+write_if_missing "STATE.md" << 'TEMPLATE_EOF'
 # state
 > last updated: <date>
 
@@ -326,82 +362,11 @@ write_if_missing "STATE.md" << 'EOF'
 | date | work | next |
 |------|------|------|
 | yyyy-mm-dd | <done> | <next> |
-EOF
+TEMPLATE_EOF
 
-# ── 5. SKILL.md — disciplined coding ────────────────────────────────
-write_if_missing "SKILL.md" << 'EOF'
-# disciplined-coding
-
-Use for any code change that requires disciplined implementation rigor — not trivial one-liners.
-
-## before you write code
-- State your assumptions explicitly. If uncertain, ask.
-- If the task is ambiguous, list the possible interpretations — don't pick silently.
-- If a clearly simpler approach exists, recommend it. Push back if warranted.
-- If you are confused about any aspect, stop and ask.
-
-## while you write code
-- Write the minimum code that solves the exact problem. Nothing more.
-- Do not add features, abstractions, or configuration options beyond what was asked.
-- Touch only the lines that need to change. Match existing style exactly.
-- Do not add error handling for impossible scenarios.
-- When removing code, clean up imports and variables that YOUR change made unused.
-
-## after you write code
-- Can every changed line be traced to the user's request? If not, undo it.
-- Would a senior engineer say this is overcomplicated? If yes, simplify.
-- Run the project's validation commands and fix any issues before declaring done.
-
-## verification pattern
-For any multi-step change, structure your plan as:
-```
-1. [step] → verify: [how you will check]
-2. [step] → verify: [how you will check]
-3. [step] → verify: [how you will check]
-```
-EOF
-
-# ── 6. Sub-agents ──────────────────────────────────────────────────
-write_if_missing ".agents/reviewer.md" << 'EOF'
-# reviewer
-
-A code review sub-agent that evaluates work done by the primary agent.
-
-## instructions
-1. **Goal check**: Does the change satisfy the stated goal? If not, reject and explain why.
-2. **Simplicity check**: Is there any code, abstraction, or config that wasn't asked for? Flag it.
-3. **Surgical check**: Does the diff touch files unrelated to the goal? Flag it.
-4. **Style check**: Does the change match the project's existing conventions?
-5. **Type/lint/test check**: Would the project's validation pass?
-6. **Safety check**: Could this break other parts of the system?
-
-## output
-- **approve**: no issues found
-- **changes requested**: list each issue with file:line and the exact fix needed
-- **blocked**: critical issue that must be addressed before merging
-EOF
-
-write_if_missing ".agents/security-auditor.md" << 'EOF'
-# security-auditor
-
-Security audit sub-agent for changes touching auth, APIs, or user input.
-
-## instructions
-1. **Input safety**: If user-controlled text is accepted, verify it is normalized, capped in length, and not passed raw into anything.
-2. **Data leakage**: Verify no internal tracing, model names, or debug metadata is returned in responses.
-3. **Auth**: Are auth/health checks in place for endpoints? Are tokens handled correctly?
-4. **Rate limiting**: Are API endpoints protected from abuse?
-5. **Env vars**: If new environment variables were added, verify they are documented.
-
-## output
-- **clean**: no security concerns
-- **advisory**: minor concern with recommendation
-- **blocked**: must-fix issue with file:line and remediation
-EOF
-
-# ── 7. docs/soul.md — quality gap tracker ────────────────────────────
-write_if_missing "docs/soul.md" << 'EOF'
-# soul
+# ── 4. docs/laundry_list.md — ranked backlog ─────────────────────────────
+write_if_missing "docs/laundry_list.md" << 'TEMPLATE_EOF'
+# laundry list
 
 the living memory of what needs love in this project. gaps, debts, and broken windows
 we know about. nothing here gets deleted — only moved to done when fixed.
@@ -440,14 +405,69 @@ we know about. nothing here gets deleted — only moved to done when fixed.
 | parity | 0 |
 | config/infra | 0 |
 | **total** | **0** |
-EOF
+TEMPLATE_EOF
 
-# ── 8. Starter skills ────────────────────────────────────────────────
-write_if_missing "templates/skills/design/SKILL.md" << 'EOF'
+# ── 5. docs/done_laundry_list.md — completed items ─────────────────────────────
+write_if_missing "docs/done_laundry_list.md" << 'TEMPLATE_EOF'
+# done laundry list
+
+completed items from `docs/laundry_list.md`. nothing is deleted — only moved here.
+
+**read this to avoid re-fixing what's already fixed.**
+
+---
+
+| date completed | area | original item | notes |
+|----------------|------|---------------|-------|
+| yyyy-mm-dd | ux/ui | item text | implementation notes |
+TEMPLATE_EOF
+
+# ── 6. skill — disciplined coding ─────────────────────────────
+write_if_missing "skills/disciplined-coding/SKILL.md" << 'TEMPLATE_EOF'
+---
+name: disciplined-coding
+description: Use for any code change that requires disciplined implementation rigor — not trivial one-liners.
+---
+
+# disciplined-coding
+
+## before you write code
+- State your assumptions explicitly. If uncertain, ask.
+- If the task is ambiguous, list the possible interpretations — don't pick silently.
+- If a clearly simpler approach exists, recommend it. Push back if warranted.
+- If you are confused about any aspect, stop and ask.
+
+## while you write code
+- Write the minimum code that solves the exact problem. Nothing more.
+- Do not add features, abstractions, or configuration options beyond what was asked.
+- Touch only the lines that need to change. Match existing style exactly.
+- Do not add error handling for impossible scenarios.
+- When removing code, clean up imports and variables that YOUR change made unused.
+
+## after you write code
+- Can every changed line be traced to the user's request? If not, undo it.
+- Would a senior engineer say this is overcomplicated? If yes, simplify.
+- Run the project's validation commands and fix any issues before declaring done.
+
+## verification pattern
+For any multi-step change, structure your plan as:
+```
+1. [step] → verify: [how you will check]
+2. [step] → verify: [how you will check]
+3. [step] → verify: [how you will check]
+```
+TEMPLATE_EOF
+
+# ── 7. skill — frontend design ─────────────────────────────
+write_if_missing "skills/design/SKILL.md" << 'TEMPLATE_EOF'
+---
+name: design
+description: Use when building or refining UI components, pages, or visual design.
+---
+
 # design
 
 Frontend design guidelines adapted from Anthropic's frontend-design skill.
-Use when building or refining UI components, pages, or visual design.
 
 ## when to use
 - building or restyling any component
@@ -487,38 +507,119 @@ Before coding, understand the context and commit to a clear aesthetic direction:
 - Cookie-cutter card layouts with rounded corners + shadow
 - Over-engineered animations that serve no purpose
 - Trend-driven aesthetics (glassmorphism, neubrutalism)
-EOF
+TEMPLATE_EOF
 
-# ── 9. .gitignore ─────────────────────────────────────────────────────
-write_if_missing ".gitignore" << 'EOF'
+# ── 8. sub-agent — reviewer ─────────────────────────────
+write_if_missing ".agents/reviewer.md" << 'TEMPLATE_EOF'
+# reviewer
+
+A code review sub-agent that evaluates work done by the primary agent.
+
+## instructions
+1. **Goal check**: Does the change satisfy the stated goal? If not, reject and explain why.
+2. **Simplicity check**: Is there any code, abstraction, or config that wasn't asked for? Flag it.
+3. **Surgical check**: Does the diff touch files unrelated to the goal? Flag it.
+4. **Style check**: Does the change match the project's existing conventions?
+5. **Type/lint/test check**: Would the project's validation pass?
+6. **Safety check**: Could this break other parts of the system?
+
+## output
+- **approve**: no issues found
+- **changes requested**: list each issue with file:line and the exact fix needed
+- **blocked**: critical issue that must be addressed before merging
+TEMPLATE_EOF
+
+# ── 9. sub-agent — security auditor ─────────────────────────────
+write_if_missing ".agents/security-auditor.md" << 'TEMPLATE_EOF'
+# security-auditor
+
+Security audit sub-agent for changes touching auth, APIs, or user input.
+
+## instructions
+1. **Input safety**: If user-controlled text is accepted, verify it is normalized, capped in length, and not passed raw into anything.
+2. **Data leakage**: Verify no internal tracing, model names, or debug metadata is returned in responses.
+3. **Auth**: Are auth/health checks in place for endpoints? Are tokens handled correctly?
+4. **Rate limiting**: Are API endpoints protected from abuse?
+5. **Env vars**: If new environment variables were added, verify they are documented.
+
+## output
+- **clean**: no security concerns
+- **advisory**: minor concern with recommendation
+- **blocked**: must-fix issue with file:line and remediation
+TEMPLATE_EOF
+
+# ── 10. automation — scheduled triage ─────────────────────────────
+write_if_missing ".github/workflows/loop-triage.yml" << 'TEMPLATE_EOF'
+name: loop-triage
+
+# Scheduled discovery: surfaces open laundry-list items as a recurring triage
+# issue so the loop has fresh input without human prompting.
+# Manual-only by default — uncomment the schedule block to enable the cron
+# once your laundry list is trustworthy.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 6 * * 1" # Mondays 06:00 UTC
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open or update the triage issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open_items="$(grep -n '^- \[ \]' docs/laundry_list.md || true)"
+          if [ -z "$open_items" ]; then
+            open_items="(none - populate docs/laundry_list.md)"
+          fi
+          title="loop-triage: open laundry list items"
+          body="$(printf 'Open items in docs/laundry_list.md as of %s:\n\n```\n%s\n```' "$(date -u +%F)" "$open_items")"
+          existing="$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+TEMPLATE_EOF
+
+# ── 11. .gitignore ───────────────────────────────────────────────────
+write_if_missing ".gitignore" << 'TEMPLATE_EOF'
 node_modules/
 dist/
 .tmp/
 *.log
 .DS_Store
-EOF
+TEMPLATE_EOF
 
 echo ""
 echo "=== loop-kit: bootstrapped $TARGET ==="
 echo ""
 echo "Generated files:"
-echo "  SESSION.md      ← session-start prompt (give this to your agent)"
-echo "  AGENTS.md       ← operating model + principles (fill in <!-- TODO -->)"
-echo "  STATE.md        ← session memory"
-echo "  SKILL.md        ← disciplined coding"
-echo "  docs/soul.md    ← quality gap tracker"
-echo "  docs/done_soul.md ← completed items"
-echo "  .agents/reviewer.md"
-echo "  .agents/security-auditor.md"
+echo "  SESSION.md                        ← session-start prompt (give this to your agent)"
+echo "  AGENTS.md                         ← operating model + principles (fill in <!-- TODO -->)"
+echo "  STATE.md                          ← session memory"
+echo "  docs/laundry_list.md              ← ranked backlog"
+echo "  docs/done_laundry_list.md         ← completed items"
+echo "  skills/disciplined-coding/        ← disciplined coding skill"
+echo "  skills/design/                    ← frontend design skill"
+echo "  .agents/reviewer.md               ← code review sub-agent"
+echo "  .agents/security-auditor.md       ← security audit sub-agent"
+echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"
 echo ""
 echo "Next steps:"
 echo "  1. Edit AGENTS.md — fill in <!-- TODO --> placeholders"
-echo "  2. Populate docs/soul.md by auditing your codebase"
-echo "  3. Add project-specific skills under templates/skills/<name>/SKILL.md"
-echo "  4. Add automations under .github/workflows/ as needed"
+echo "  2. Populate docs/laundry_list.md by auditing your codebase"
+echo "  3. Add project-specific skills under skills/<name>/SKILL.md"
+echo "  4. Enable the cron in .github/workflows/loop-triage.yml when the list is trustworthy"
 echo "  5. Commit: git add . && git commit -m 'feat: establish loop engineering operating model'"
 echo ""
 echo "The loop is ready. Next session:"
 echo "  1. Give SESSION.md to your agent as the session-start prompt"
-echo "  2. The agent reads STATE.md + soul.md and starts the operating loop"
-echo "  3. After session: agent updates STATE.md and commits"
+echo "  2. The agent reads STATE.md + docs/laundry_list.md and runs the operating loop"
+echo "  3. The agent ships a PR with verification evidence — the human reviews it (Ship gate)"

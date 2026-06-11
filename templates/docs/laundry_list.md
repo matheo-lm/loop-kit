@@ -1,4 +1,4 @@
-# soul
+# laundry list
 
 the living memory of what needs love in this project. gaps, debts, and broken windows
 we know about. nothing here gets deleted — only moved to done when fixed.
