@@ -3,7 +3,7 @@
 # Usage: curl -fsSL https://raw.githubusercontent.com/matheo-lm/loop-kit/main/scripts/loop-init.sh | bash
 #   or:  ./loop-init.sh /path/to/project
 #
-# NOTE: the file blocks below mirror templates/ — keep them in sync.
+# GENERATED FILE — do not edit by hand. Edit templates/ and run scripts/build-init.sh.
 
 set -euo pipefail
 
@@ -156,6 +156,7 @@ Do not fix unrelated failures.
 The work is graded by a pass that did not write it:
 - Dispatch `.agents/reviewer.md` as a sub-agent to review the diff against the acceptance criteria. If your tool has no sub-agents, re-read the full diff cold against the criteria before declaring done.
 - If the change touched auth, API surfaces, or user input handling, also run `.agents/security-auditor.md`.
+- If the change touched user-facing UI, evaluate the changed screens against `skills/usability-heuristics/SKILL.md` — findings of severity 3+ block the ship.
 - Address "changes requested" and "blocked" findings before shipping. Findings are inputs, not truth — the primary agent owns consolidation.
 
 ### Evaluate
@@ -509,7 +510,67 @@ Before coding, understand the context and commit to a clear aesthetic direction:
 - Trend-driven aesthetics (glassmorphism, neubrutalism)
 TEMPLATE_EOF
 
-# ── 8. sub-agent — reviewer ─────────────────────────────
+# ── 8. skill — usability heuristics ─────────────────────────────
+write_if_missing "skills/usability-heuristics/SKILL.md" << 'TEMPLATE_EOF'
+---
+name: usability-heuristics
+description: Use when designing or reviewing any user-facing surface — evaluate against Nielsen's 10 usability heuristics, name the violated heuristic, and rate severity 0-4 so findings are prioritized fixes, not opinions.
+---
+
+# usability-heuristics
+
+Condensed from the usability canon — Jakob Nielsen's 10 heuristics (NN/g), Don Norman's signifiers and feedback, Ben Shneiderman's golden rules, Dieter Rams' "less, but better". Structure inspired by [jpoindexter/design-and-ai-skills](https://github.com/jpoindexter/design-and-ai-skills).
+
+A finding without a principle is an opinion; a finding without severity can't be prioritized. When you flag a problem: name the heuristic, rate the severity, propose the fix.
+
+## the 10 heuristics
+
+| # | Heuristic | Rule of thumb | Typical fix |
+|---|-----------|---------------|-------------|
+| H1 | Visibility of system status | Every action gives immediate feedback; every wait shows progress. | Loading states, disabled-on-submit, explicit success/failure confirmation. |
+| H2 | Match the real world | Speak the user's language, never internal codes or jargon. | Translate errors to plain language; use the words real users use. |
+| H3 | User control and freedom | Every state has a clearly marked exit; mistakes are reversible. | Cancel/Back everywhere; prefer an undo toast over a confirm nag. |
+| H4 | Consistency and standards | Same word, color, and position for the same action; follow platform conventions. | One term per concept; use the design system, not bespoke variants. |
+| H5 | Error prevention | Design so the error can't happen, rather than reporting it well. | Constrain inputs (pickers, masks, disabled invalid options); validate inline before submit. |
+| H6 | Recognition over recall | Show options and carry context forward; never make users remember across screens. | Autocomplete, recents, visible choices, prefilled data, placeholders. |
+| H7 | Flexibility and efficiency | Accelerators for experts that stay invisible to novices. | Shortcuts, bulk actions, saved views — behind progressive disclosure. |
+| H8 | Aesthetic and minimalist design | Every extra element competes with the relevant ones. | Cut ruthlessly; one primary action per screen; disclose detail on demand. |
+| H9 | Help users recover from errors | Errors say what happened, why, and how to fix it — in plain language, at the point of error. | Specific inline messages; preserve the user's input. |
+| H10 | Help and documentation | Best is needing none; otherwise contextual, searchable, task-focused. | Tooltips and guided empty states over manuals. |
+
+Also check (Norman): every interactive element has a visible signifier — nothing clickable should look like plain text, and nothing decorative should look clickable.
+
+## evaluation method
+
+1. Walk the interface twice: once for flow, once inspecting each element against every heuristic.
+2. Log each problem: location, heuristic violated, why it's a problem, severity, recommended fix.
+3. Sort by severity descending; fix top-down.
+
+Severity scale (Nielsen, 0-4):
+
+| Rating | Meaning | Action |
+|--------|---------|--------|
+| 0 | Not a usability problem | Ignore |
+| 1 | Cosmetic | Fix if spare time |
+| 2 | Minor | Schedule |
+| 3 | Major | Fix before release |
+| 4 | Catastrophe | Block release |
+
+## common violations
+
+- Silent submit button → double-charge from re-tapping (H1): disable on tap, show progress, confirm result.
+- Raw error codes surfaced to users (`HTTP 500`, `EACCES`) (H2, H9): plain-language what/why/fix.
+- Destructive or bulk action with no undo (H3, H5): undo window, or type-to-confirm for the irreversible.
+- "Submit" / "Send" / "Go" all meaning the same action (H4): one term, everywhere.
+- Free-text field where a picker fits; server-side-only validation (H5): constrain and validate inline.
+- Form clears the user's input on error (H9): preserve everything they typed.
+
+## when reviewing a diff
+
+If the change touches anything user-facing, run the table above against the changed screens and report findings in the evaluation format: `location · heuristic · why · severity · fix`. Findings of severity 3+ block the ship.
+TEMPLATE_EOF
+
+# ── 9. sub-agent — reviewer ─────────────────────────────
 write_if_missing ".agents/reviewer.md" << 'TEMPLATE_EOF'
 # reviewer
 
@@ -529,7 +590,7 @@ A code review sub-agent that evaluates work done by the primary agent.
 - **blocked**: critical issue that must be addressed before merging
 TEMPLATE_EOF
 
-# ── 9. sub-agent — security auditor ─────────────────────────────
+# ── 10. sub-agent — security auditor ─────────────────────────────
 write_if_missing ".agents/security-auditor.md" << 'TEMPLATE_EOF'
 # security-auditor
 
@@ -548,7 +609,7 @@ Security audit sub-agent for changes touching auth, APIs, or user input.
 - **blocked**: must-fix issue with file:line and remediation
 TEMPLATE_EOF
 
-# ── 10. automation — scheduled triage ─────────────────────────────
+# ── 11. automation — scheduled triage ─────────────────────────────
 write_if_missing ".github/workflows/loop-triage.yml" << 'TEMPLATE_EOF'
 name: loop-triage
 
@@ -588,7 +649,7 @@ jobs:
           fi
 TEMPLATE_EOF
 
-# ── 11. .gitignore ───────────────────────────────────────────────────
+# ── 12. .gitignore ───────────────────────────────────────────────────
 write_if_missing ".gitignore" << 'TEMPLATE_EOF'
 node_modules/
 dist/
@@ -596,6 +657,19 @@ dist/
 *.log
 .DS_Store
 TEMPLATE_EOF
+
+# ── 13. Claude Code skill discovery ──────────────────────────────────
+# Relative symlinks so skills are discovered natively by Claude Code.
+# Committed to the repo on purpose: the loop's setup should be portable,
+# not per-machine. Harmless for other agent tools.
+mkdir -p .claude/skills
+for skill_dir in skills/*/; do
+  skill_name="$(basename "$skill_dir")"
+  if [ ! -e ".claude/skills/$skill_name" ]; then
+    ln -s "../../skills/$skill_name" ".claude/skills/$skill_name"
+    echo "  +  .claude/skills/$skill_name -> ../../skills/$skill_name"
+  fi
+done
 
 echo ""
 echo "=== loop-kit: bootstrapped $TARGET ==="
@@ -608,9 +682,11 @@ echo "  docs/laundry_list.md              ← ranked backlog"
 echo "  docs/done_laundry_list.md         ← completed items"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
+echo "  skills/usability-heuristics/      ← usability evaluation skill"
 echo "  .agents/reviewer.md               ← code review sub-agent"
 echo "  .agents/security-auditor.md       ← security audit sub-agent"
 echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"
+echo "  .claude/skills/*                  ← Claude Code skill symlinks (commit these)"
 echo ""
 echo "Next steps:"
 echo "  1. Edit AGENTS.md — fill in <!-- TODO --> placeholders"

@@ -46,9 +46,11 @@ docs/laundry_list.md              ← ranked backlog / quality gap tracker
 docs/done_laundry_list.md         ← completed items archive
 skills/disciplined-coding/SKILL.md ← disciplined coding skill
 skills/design/SKILL.md            ← frontend design skill
+skills/usability-heuristics/SKILL.md ← usability evaluation skill
 .agents/reviewer.md               ← code review sub-agent
 .agents/security-auditor.md       ← security audit sub-agent
 .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)
+.claude/skills/*                  ← Claude Code skill symlinks (committed — portable setup)
 ```
 
 **AGENTS.md** is the spine. It contains:
@@ -110,22 +112,23 @@ Run a deep audit of your codebase (grep for common issues, inspect components, c
 
 ### Add project skills
 
-Domain-specific skills go under `skills/<name>/SKILL.md`. Loop-kit ships with two starters — `skills/disciplined-coding/SKILL.md` and `skills/design/SKILL.md` (adapted from [Anthropic's frontend-design skill](https://agenticskills.io/skills/frontend-design)). Add more:
+Domain-specific skills go under `skills/<name>/SKILL.md`. Loop-kit ships with three starters — `skills/disciplined-coding/SKILL.md`, `skills/design/SKILL.md` (adapted from [Anthropic's frontend-design skill](https://agenticskills.io/skills/frontend-design)), and `skills/usability-heuristics/SKILL.md` (the Nielsen/Norman/Shneiderman/Rams canon condensed into a severity-rated evaluation method; structure inspired by [jpoindexter/design-and-ai-skills](https://github.com/jpoindexter/design-and-ai-skills)). Add more:
 
 ```
 skills/
   disciplined-coding/SKILL.md      ← implementation rigor (included)
   design/SKILL.md                  ← frontend design (included)
+  usability-heuristics/SKILL.md    ← heuristic evaluation (included)
   react-best-practices/SKILL.md    ← Vercel's 70 React rules
   react-native-best-practices/     ← Callstack's RN perf guide
   systematic-debugging/            ← 4-phase debug methodology
   webapp-testing/                  ← Playwright testing guide
 ```
 
-Every skill carries YAML frontmatter (`name`, `description`) so agent tools can discover it. For Claude Code, symlink skills into `.claude/skills/`:
+Every skill carries YAML frontmatter (`name`, `description`) so agent tools can discover it. The bootstrap creates `.claude/skills/` symlinks automatically for Claude Code — commit them, the setup is meant to be portable. When you add a new skill, link it the same way:
 
 ```bash
-mkdir -p .claude/skills && ln -s ../../skills/<name> .claude/skills/<name>
+ln -s ../../skills/<name> .claude/skills/<name>
 ```
 
 ---
