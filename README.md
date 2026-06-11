@@ -26,7 +26,7 @@ Loop-kit gives you the five pieces, ready to drop in:
 |-------|------|-------------|
 | **Memory** | `STATE.md` | Persistent session state. Agent reads at start, writes at end. The model forgets; the repo doesn't. |
 | **Skills** | `SKILL.md` | Codified project knowledge. Conventions, build steps, rationale — written once, read every run. |
-| **Sub-agents** | `.opencode/agents/reviewer.md` | Maker/checker separation. One writes, a second verifies. |
+| **Sub-agents** | `.agents/reviewer.md` | Maker/checker separation. One writes, a second verifies. |
 | **Automations** | `.github/workflows/` | Scheduled discovery and triage without human prompting. |
 | **Worktrees** | `AGENTS.md` | Documented `git worktree` pattern for parallel agents. |
 
@@ -39,12 +39,14 @@ Plus the **Karpathy operating principles** at the top of `AGENTS.md`: think befo
 After running the bootstrap, your repo gets:
 
 ```
+SESSION.md                        ← session-start prompt (give this to your agent)
 AGENTS.md                         ← operating model + principles
 STATE.md                          ← session memory
 SKILL.md                          ← disciplined coding skill
 docs/soul.md                      ← quality gap tracker
-.opencode/agents/reviewer.md      ← code review sub-agent
-.opencode/agents/security-auditor.md ← security audit sub-agent
+docs/done_soul.md                 ← completed items archive
+.agents/reviewer.md               ← code review sub-agent
+.agents/security-auditor.md       ← security audit sub-agent
 ```
 
 **AGENTS.md** is the spine. It contains:
@@ -69,6 +71,30 @@ Then edit `AGENTS.md` with your project's:
 - Project structure
 - Coding style conventions
 - Testing guidelines
+
+### Start every session with this prompt
+
+After setup, **`SESSION.md` is what you give your agent** at the start of each session. It tells the agent:
+
+```
+Read AGENTS.md → read STATE.md + docs/soul.md → run 5-phase operating loop → commit → loop
+```
+
+Open your agent's chat/terminal and paste:
+
+```
+Read SESSION.md and follow it. The project is at <path-to-repo>.
+```
+
+Or reference the file path directly if your agent supports file reading:
+
+```
+Read <path-to-repo>/SESSION.md and follow it.
+```
+
+The agent then runs the full ritual: gather evidence, build candidates, commit to one item, implement, verify, bookkeep, and loop until done.
+
+---
 
 ### Two-shot with audit
 
@@ -97,23 +123,16 @@ skills/
 
 ## Agent workflow
 
-Every session follows the same loop:
+Every session follows the phased loop in `SESSION.md`:
 
 ```
-git pull → read STATE.md → plan → implement → verify → update STATE.md → commit + push → loop
+SESSION.md → AGENTS.md → STATE.md + soul.md → gather evidence → build candidates →
+commit to one → implement → verify → bookkeep → commit + push → loop
 ```
 
-The agent handles sync, commit, and push automatically. You never need to ask.
+The user's part: give `SESSION.md` to your agent at session start.
 
-1. **Sync**: `git pull origin main` to synchronize with remote.
-2. **Start**: Read `STATE.md`. Understand what's in progress, what's blocked.
-3. **Plan**: State assumptions. List steps with verification criteria.
-4. **Execute**: Surgical, simple changes. Match existing patterns.
-5. **Verify**: Run `typecheck && lint && test`.
-6. **Record**: Update `STATE.md`.
-7. **Commit**: Conventional commit message. Stage only intended files.
-8. **Push**: `git push origin main`.
-9. **Loop**: If the goal isn't met, return to step 2.
+The agent's part: everything else — planning, implementation, verification, bookkeeping, looping.
 
 ---
 
@@ -133,7 +152,7 @@ Loop-kit is built on three convictions:
 
 This is a starter kit, not a framework. It gives you the files and the pattern. You supply the project-specific conventions, build commands, and domain expertise.
 
-The templates are universal — they work with any coding agent (opencode, Claude Code, Codex, Cursor) and any language or stack.
+The templates are universal — they work with any coding agent (Claude Code, opencode, Codex, Cursor, Copilot) and any language or stack.
 
 ---
 

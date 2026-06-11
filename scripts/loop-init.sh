@@ -262,7 +262,7 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 
 1. **Memory** — `STATE.md` tracks what'\''s done, what'\''s next, and open blockers. The agent reads this at session start and writes to it at session end. The model forgets; the repo doesn'\''t.
 2. **Skills** — `SKILL.md` files codify project knowledge so every agent doesn'\''t re-derive it from zero. Conventions, build steps, rationale — written once, read every run.
-3. **Sub-agents** — Maker and checker are separated. Defined in `.opencode/agents/`. The agent that writes is never the sole agent that grades.
+3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/`. The agent that writes is never the sole agent that grades.
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting. Findings land in STATE.md for the next agent session.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don'\''t collide.
 
@@ -361,7 +361,7 @@ For any multi-step change, structure your plan as:
 '
 
 # ── 6. Sub-agents ────────────────────────────────────────────────────
-write_if_missing ".opencode/agents/reviewer.md" \
+write_if_missing ".agents/reviewer.md" \
 '# reviewer
 
 A code review sub-agent that evaluates work done by the primary agent.
@@ -380,7 +380,7 @@ A code review sub-agent that evaluates work done by the primary agent.
 - **blocked**: critical issue that must be addressed before merging
 '
 
-write_if_missing ".opencode/agents/security-auditor.md" \
+write_if_missing ".agents/security-auditor.md" \
 '# security-auditor
 
 Security audit sub-agent for changes touching auth, APIs, or user input.
@@ -507,8 +507,8 @@ echo "  STATE.md        ← session memory"
 echo "  SKILL.md        ← disciplined coding"
 echo "  docs/soul.md    ← quality gap tracker"
 echo "  docs/done_soul.md ← completed items"
-echo "  .opencode/agents/reviewer.md"
-echo "  .opencode/agents/security-auditor.md"
+echo "  .agents/reviewer.md"
+echo "  .agents/security-auditor.md"
 echo ""
 echo "Next steps:"
 echo "  1. Edit AGENTS.md — fill in <!-- TODO --> placeholders"
