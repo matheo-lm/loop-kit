@@ -27,10 +27,12 @@ jobs:
           git init
           bash "${{ github.workspace }}/scripts/loop-init.sh" .
           # verify all expected files exist
+          test -f SESSION.md || { echo "missing SESSION.md"; exit 1; }
           test -f AGENTS.md || { echo "missing AGENTS.md"; exit 1; }
           test -f STATE.md || { echo "missing STATE.md"; exit 1; }
           test -f SKILL.md || { echo "missing SKILL.md"; exit 1; }
           test -f docs/soul.md || { echo "missing docs/soul.md"; exit 1; }
+          test -f docs/done_soul.md || { echo "missing done_soul.md"; exit 1; }
           test -f .opencode/agents/reviewer.md || { echo "missing reviewer"; exit 1; }
           test -f .opencode/agents/security-auditor.md || { echo "missing security-auditor"; exit 1; }
           echo "All files present. Bootstrap test passed."
