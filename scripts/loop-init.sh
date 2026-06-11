@@ -6,6 +6,7 @@
 set -euo pipefail
 
 TARGET="${1:-.}"
+mkdir -p "$TARGET"
 cd "$TARGET"
 
 echo "=== loop-kit: bootstrapping $TARGET ==="
@@ -13,19 +14,19 @@ echo "=== loop-kit: bootstrapping $TARGET ==="
 # ── helpers ──────────────────────────────────────────────────────────
 write_if_missing() {
   local file="$1"
-  local content="$2"
   if [ -f "$file" ]; then
-    echo "  ⏭  $file (already exists)"
+    echo "  -  $file (already exists)"
+    cat > /dev/null
   else
     mkdir -p "$(dirname "$file")"
-    cat > "$file" <<< "$content"
-    echo "  ✓ $file"
+    cat > "$file"
+    echo "  +  $file"
   fi
 }
 
 # ── 1. SESSION.md — session-start prompt ────────────────────────────
-write_if_missing "SESSION.md" \
-'# Session start
+write_if_missing "SESSION.md" << 'EOF'
+# Session start
 
 Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
 
@@ -130,7 +131,7 @@ Prefer the smallest change that satisfies acceptance criteria.
 After implementation:
 
 ### Verify
-Run the project'\''s validation:
+Run the project's validation:
 - touched unit tests
 - typecheck
 - lint
@@ -184,26 +185,26 @@ Do not declare success until ALL are true:
 - remaining risks documented in `STATE.md`
 
 If any criterion is unmet, continue the loop.
-'
+EOF
 
 # ── 2. docs/done_soul.md — completed items ───────────────────────────
-write_if_missing "docs/done_soul.md" \
-'# done soul
+write_if_missing "docs/done_soul.md" << 'EOF'
+# done soul
 
 completed items from `docs/soul.md`. nothing is deleted — only moved here.
 
-**read this to avoid re-fixing what'\''s already fixed.**
+**read this to avoid re-fixing what's already fixed.**
 
 ---
 
 | date completed | area | original item | notes |
 |----------------|------|---------------|-------|
 | yyyy-mm-dd | ux/ui | item text | implementation notes |
-'
+EOF
 
 # ── 3. AGENTS.md — operating model ───────────────────────────────────
-write_if_missing "AGENTS.md" \
-'# Repository Guidelines
+write_if_missing "AGENTS.md" << 'EOF'
+# Repository Guidelines
 
 Read `SESSION.md` before starting a session. It defines the operating loop.
 
@@ -212,27 +213,27 @@ Read `SESSION.md` before starting a session. It defines the operating loop.
 These principles govern every agent interaction. Read them first. Apply them always.
 
 ### 1. Think Before Coding
-Don'\''t assume. Don'\''t hide confusion. Surface tradeoffs.
+Don't assume. Don't hide confusion. Surface tradeoffs.
 - State your assumptions explicitly before implementing. If uncertain, ask.
-- If multiple interpretations exist, present them — don'\''t pick silently.
+- If multiple interpretations exist, present them — don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what'\''s confusing. Ask.
+- If something is unclear, stop. Name what's confusing. Ask.
 
 ### 2. Simplicity First
 Minimum code that solves the problem. Nothing speculative.
 - No features beyond what was asked. No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn'\''t requested.
+- No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
 - Ask: "Would a senior engineer say this is overcomplicated?"
 
 ### 3. Surgical Changes
 Touch only what you must. Clean up only your own mess.
-- Don'\''t "improve" adjacent code, comments, or formatting.
-- Don'\''t refactor things that aren'\''t broken.
-- Match existing style, even if you'\''d do it differently.
-- If you notice unrelated dead code, mention it — don'\''t delete it.
-- Every changed line should trace directly to the user'\''s request.
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+- Every changed line should trace directly to the user's request.
 
 ### 4. Goal-Driven Execution
 Define success criteria. Loop until verified.
@@ -250,7 +251,7 @@ Define success criteria. Loop until verified.
 
 ## Loop Engineering: How We Operate
 
-This project uses loop engineering as its operating model. The agent doesn'\''t just respond — it discovers, plans, develops, and iterates autonomously within a designed system.
+This project uses loop engineering as its operating model. The agent doesn't just respond — it discovers, plans, develops, and iterates autonomously within a designed system.
 
 ### The Loop
 
@@ -260,11 +261,11 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 
 ### The Five Pieces
 
-1. **Memory** — `STATE.md` tracks what'\''s done, what'\''s next, and open blockers. The agent reads this at session start and writes to it at session end. The model forgets; the repo doesn'\''t.
-2. **Skills** — `SKILL.md` files codify project knowledge so every agent doesn'\''t re-derive it from zero. Conventions, build steps, rationale — written once, read every run.
+1. **Memory** — `STATE.md` tracks what's done, what's next, and open blockers. The agent reads this at session start and writes to it at session end. The model forgets; the repo doesn't.
+2. **Skills** — `SKILL.md` files codify project knowledge so every agent doesn't re-derive it from zero. Conventions, build steps, rationale — written once, read every run.
 3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/`. The agent that writes is never the sole agent that grades.
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting. Findings land in STATE.md for the next agent session.
-5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don'\''t collide.
+5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
 
 ### Session Ritual
 
@@ -295,11 +296,11 @@ In summary:
 
 ## Commit & Pull Request Guidelines
 <!-- TODO: describe commit message format, PR process -->
-'
+EOF
 
 # ── 4. STATE.md — session memory ────────────────────────────────────
-write_if_missing "STATE.md" \
-'# state
+write_if_missing "STATE.md" << 'EOF'
+# state
 > last updated: <date>
 
 ## current goal
@@ -325,17 +326,17 @@ write_if_missing "STATE.md" \
 | date | work | next |
 |------|------|------|
 | yyyy-mm-dd | <done> | <next> |
-'
+EOF
 
 # ── 5. SKILL.md — disciplined coding ────────────────────────────────
-write_if_missing "SKILL.md" \
-'# disciplined-coding
+write_if_missing "SKILL.md" << 'EOF'
+# disciplined-coding
 
 Use for any code change that requires disciplined implementation rigor — not trivial one-liners.
 
 ## before you write code
 - State your assumptions explicitly. If uncertain, ask.
-- If the task is ambiguous, list the possible interpretations — don'\''t pick silently.
+- If the task is ambiguous, list the possible interpretations — don't pick silently.
 - If a clearly simpler approach exists, recommend it. Push back if warranted.
 - If you are confused about any aspect, stop and ask.
 
@@ -347,9 +348,9 @@ Use for any code change that requires disciplined implementation rigor — not t
 - When removing code, clean up imports and variables that YOUR change made unused.
 
 ## after you write code
-- Can every changed line be traced to the user'\''s request? If not, undo it.
+- Can every changed line be traced to the user's request? If not, undo it.
 - Would a senior engineer say this is overcomplicated? If yes, simplify.
-- Run the project'\''s validation commands and fix any issues before declaring done.
+- Run the project's validation commands and fix any issues before declaring done.
 
 ## verification pattern
 For any multi-step change, structure your plan as:
@@ -358,30 +359,30 @@ For any multi-step change, structure your plan as:
 2. [step] → verify: [how you will check]
 3. [step] → verify: [how you will check]
 ```
-'
+EOF
 
-# ── 6. Sub-agents ────────────────────────────────────────────────────
-write_if_missing ".agents/reviewer.md" \
-'# reviewer
+# ── 6. Sub-agents ──────────────────────────────────────────────────
+write_if_missing ".agents/reviewer.md" << 'EOF'
+# reviewer
 
 A code review sub-agent that evaluates work done by the primary agent.
 
 ## instructions
 1. **Goal check**: Does the change satisfy the stated goal? If not, reject and explain why.
-2. **Simplicity check**: Is there any code, abstraction, or config that wasn'\''t asked for? Flag it.
+2. **Simplicity check**: Is there any code, abstraction, or config that wasn't asked for? Flag it.
 3. **Surgical check**: Does the diff touch files unrelated to the goal? Flag it.
-4. **Style check**: Does the change match the project'\''s existing conventions?
-5. **Type/lint/test check**: Would the project'\''s validation pass?
+4. **Style check**: Does the change match the project's existing conventions?
+5. **Type/lint/test check**: Would the project's validation pass?
 6. **Safety check**: Could this break other parts of the system?
 
 ## output
 - **approve**: no issues found
 - **changes requested**: list each issue with file:line and the exact fix needed
 - **blocked**: critical issue that must be addressed before merging
-'
+EOF
 
-write_if_missing ".agents/security-auditor.md" \
-'# security-auditor
+write_if_missing ".agents/security-auditor.md" << 'EOF'
+# security-auditor
 
 Security audit sub-agent for changes touching auth, APIs, or user input.
 
@@ -396,11 +397,11 @@ Security audit sub-agent for changes touching auth, APIs, or user input.
 - **clean**: no security concerns
 - **advisory**: minor concern with recommendation
 - **blocked**: must-fix issue with file:line and remediation
-'
+EOF
 
 # ── 7. docs/soul.md — quality gap tracker ────────────────────────────
-write_if_missing "docs/soul.md" \
-'# soul
+write_if_missing "docs/soul.md" << 'EOF'
+# soul
 
 the living memory of what needs love in this project. gaps, debts, and broken windows
 we know about. nothing here gets deleted — only moved to done when fixed.
@@ -439,13 +440,13 @@ we know about. nothing here gets deleted — only moved to done when fixed.
 | parity | 0 |
 | config/infra | 0 |
 | **total** | **0** |
-'
+EOF
 
 # ── 8. Starter skills ────────────────────────────────────────────────
-write_if_missing "templates/skills/design/SKILL.md" \
-'# design
+write_if_missing "templates/skills/design/SKILL.md" << 'EOF'
+# design
 
-Frontend design guidelines adapted from Anthropic'\''s frontend-design skill.
+Frontend design guidelines adapted from Anthropic's frontend-design skill.
 Use when building or refining UI components, pages, or visual design.
 
 ## when to use
@@ -462,7 +463,7 @@ Before coding, understand the context and commit to a clear aesthetic direction:
 ## frontend aesthetics guidelines
 
 ### typography
-- Choose fonts that fit the project'\''s character. Avoid generic system fonts, Inter, Roboto, Arial.
+- Choose fonts that fit the project's character. Avoid generic system fonts, Inter, Roboto, Arial.
 - Pair a distinctive display font with a refined body font.
 - Use CSS custom properties for consistent font stacks.
 
@@ -486,16 +487,16 @@ Before coding, understand the context and commit to a clear aesthetic direction:
 - Cookie-cutter card layouts with rounded corners + shadow
 - Over-engineered animations that serve no purpose
 - Trend-driven aesthetics (glassmorphism, neubrutalism)
-'
+EOF
 
 # ── 9. .gitignore ─────────────────────────────────────────────────────
-write_if_missing ".gitignore" \
-'node_modules/
+write_if_missing ".gitignore" << 'EOF'
+node_modules/
 dist/
 .tmp/
 *.log
 .DS_Store
-'
+EOF
 
 echo ""
 echo "=== loop-kit: bootstrapped $TARGET ==="
