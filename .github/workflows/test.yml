@@ -1,0 +1,36 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck on init script
+        run: |
+          sudo apt-get install -y shellcheck
+          shellcheck scripts/loop-init.sh
+
+  bootstrap-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap into a temp project
+        run: |
+          mkdir /tmp/test-project
+          cd /tmp/test-project
+          git init
+          bash "${{ github.workspace }}/scripts/loop-init.sh" .
+          # verify all expected files exist
+          test -f AGENTS.md || { echo "missing AGENTS.md"; exit 1; }
+          test -f STATE.md || { echo "missing STATE.md"; exit 1; }
+          test -f SKILL.md || { echo "missing SKILL.md"; exit 1; }
+          test -f docs/soul.md || { echo "missing docs/soul.md"; exit 1; }
+          test -f .opencode/agents/reviewer.md || { echo "missing reviewer"; exit 1; }
+          test -f .opencode/agents/security-auditor.md || { echo "missing security-auditor"; exit 1; }
+          echo "All files present. Bootstrap test passed."
