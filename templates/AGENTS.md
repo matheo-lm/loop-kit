@@ -87,6 +87,7 @@ These thoughts mean stop — you're rationalizing:
 | "This is too simple to need acceptance criteria" | Simple items with unexamined assumptions are where rework comes from. Two lines is enough. |
 | "I'll just fix this adjacent thing while I'm here" | Scope creep breaks surgical changes. Add it to `docs/laundry_list.md` instead. |
 | "Tests probably pass" / "this should work now" | Evidence before claims. Run them. |
+| "Tests pass, so it works" | Tests prove the code satisfies its own assertions, not that the change is wired to reality. Run the artifact and watch the change happen at its surface (`skills/surface-verification/SKILL.md`). |
 | "I'll check with the human if this looks good so far" | Mid-loop permission-seeking re-inserts the human into the cycle. Verify against the criteria and ship. |
 | "The status says done, so it's done" | Statuses go stale. Verify against the code. |
 | "I'll update the docs in a follow-up" | The follow-up never comes. Same change, same PR. |

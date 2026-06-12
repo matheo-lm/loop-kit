@@ -47,6 +47,7 @@ docs/done_laundry_list.md         ← completed items archive
 skills/disciplined-coding/SKILL.md ← disciplined coding skill
 skills/design/SKILL.md            ← frontend design skill
 skills/usability-heuristics/SKILL.md ← usability evaluation skill
+skills/surface-verification/SKILL.md ← runtime-observation verification skill
 .agents/reviewer.md               ← code review sub-agent
 .agents/security-auditor.md       ← security audit sub-agent
 .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)
@@ -112,7 +113,7 @@ Run a deep audit of your codebase (grep for common issues, inspect components, c
 
 ### Add project skills
 
-Domain-specific skills go under `skills/<name>/SKILL.md`. Loop-kit ships with three starters — `skills/disciplined-coding/SKILL.md`, `skills/design/SKILL.md` (adapted from [Anthropic's frontend-design skill](https://agenticskills.io/skills/frontend-design)), and `skills/usability-heuristics/SKILL.md` (the Nielsen/Norman/Shneiderman/Rams canon condensed into a severity-rated evaluation method; structure inspired by [jpoindexter/design-and-ai-skills](https://github.com/jpoindexter/design-and-ai-skills)). Add more:
+Domain-specific skills go under `skills/<name>/SKILL.md`. Loop-kit ships with four starters — `skills/disciplined-coding/SKILL.md`, `skills/design/SKILL.md` (adapted from [Anthropic's frontend-design skill](https://agenticskills.io/skills/frontend-design)), `skills/usability-heuristics/SKILL.md` (the Nielsen/Norman/Shneiderman/Rams canon condensed into a severity-rated evaluation method; structure inspired by [jpoindexter/design-and-ai-skills](https://github.com/jpoindexter/design-and-ai-skills)), and `skills/surface-verification/SKILL.md` (verification as runtime observation — tests prove assertions, only watching the running artifact proves the change works). Add more:
 
 ```
 skills/
