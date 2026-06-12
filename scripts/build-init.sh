@@ -51,13 +51,14 @@ emit "docs/done_laundry_list.md" "5. docs/done_laundry_list.md — completed ite
 emit "skills/disciplined-coding/SKILL.md" "6. skill — disciplined coding" templates/skills/disciplined-coding/SKILL.md
 emit "skills/design/SKILL.md" "7. skill — frontend design" templates/skills/design/SKILL.md
 emit "skills/usability-heuristics/SKILL.md" "8. skill — usability heuristics" templates/skills/usability-heuristics/SKILL.md
-emit ".agents/reviewer.md" "9. sub-agent — reviewer" templates/.agents/reviewer.md
-emit ".agents/security-auditor.md" "10. sub-agent — security auditor" templates/.agents/security-auditor.md
-emit ".github/workflows/loop-triage.yml" "11. automation — scheduled triage" templates/.github/workflows/loop-triage.yml
+emit "skills/surface-verification/SKILL.md" "9. skill — surface verification" templates/skills/surface-verification/SKILL.md
+emit ".agents/reviewer.md" "10. sub-agent — reviewer" templates/.agents/reviewer.md
+emit ".agents/security-auditor.md" "11. sub-agent — security auditor" templates/.agents/security-auditor.md
+emit ".github/workflows/loop-triage.yml" "12. automation — scheduled triage" templates/.github/workflows/loop-triage.yml
 
 cat << 'FTR'
 
-# ── 12. .gitignore ───────────────────────────────────────────────────
+# ── 13. .gitignore ───────────────────────────────────────────────────
 write_if_missing ".gitignore" << 'TEMPLATE_EOF'
 node_modules/
 dist/
@@ -66,7 +67,7 @@ dist/
 .DS_Store
 TEMPLATE_EOF
 
-# ── 13. Claude Code skill discovery ──────────────────────────────────
+# ── 14. Claude Code skill discovery ──────────────────────────────────
 # Relative symlinks so skills are discovered natively by Claude Code.
 # Committed to the repo on purpose: the loop's setup should be portable,
 # not per-machine. Harmless for other agent tools.
@@ -91,6 +92,7 @@ echo "  docs/done_laundry_list.md         ← completed items"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"
+echo "  skills/surface-verification/      ← runtime-observation verification skill"
 echo "  .agents/reviewer.md               ← code review sub-agent"
 echo "  .agents/security-auditor.md       ← security audit sub-agent"
 echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"

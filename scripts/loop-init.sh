@@ -152,6 +152,19 @@ Run the project's validation:
 
 Do not fix unrelated failures.
 
+### Observe at the surface
+Validation proves the change compiles and satisfies its own assertions — not
+that it works. For every change with a runtime surface, follow
+`skills/surface-verification/SKILL.md`: run the artifact, drive it to where
+the changed code executes, capture what you observe (output, response,
+screenshot), and probe at least once off the happy path. The capture is the
+evidence that goes in the PR.
+
+If the observation contradicts the claim, that is the loop working — report
+it plainly, fix, and re-observe. If no runtime surface exists (docs-only,
+types-only, tests-only), state "no runtime surface" explicitly instead of
+substituting a test run.
+
 ### Review (maker ≠ checker)
 The work is graded by a pass that did not write it:
 - Dispatch `.agents/reviewer.md` as a sub-agent to review the diff against the acceptance criteria. If your tool has no sub-agents, re-read the full diff cold against the criteria before declaring done.
@@ -197,6 +210,7 @@ If new work is discovered:
 Open a pull request (the Ship gate):
 - Concise summary of what changed and why.
 - Verification evidence in the body — the commands you ran and their output, not assertions.
+- Surface observation in the body — what you watched the running artifact do, with the capture (or "no runtime surface").
 - If anything failed or was skipped, say so plainly.
 
 The human reviews the finished PR, not intermediate artifacts.
@@ -209,6 +223,7 @@ Do not declare success until ALL are true:
 - acceptance criteria satisfied
 - dependencies verified
 - validation passing (typecheck, lint, tests)
+- surface observation captured (or "no runtime surface" stated explicitly)
 - reviewer findings addressed
 - no new work left undocumented
 - bookkeeping updated
@@ -309,6 +324,7 @@ These thoughts mean stop — you're rationalizing:
 | "This is too simple to need acceptance criteria" | Simple items with unexamined assumptions are where rework comes from. Two lines is enough. |
 | "I'll just fix this adjacent thing while I'm here" | Scope creep breaks surgical changes. Add it to `docs/laundry_list.md` instead. |
 | "Tests probably pass" / "this should work now" | Evidence before claims. Run them. |
+| "Tests pass, so it works" | Tests prove the code satisfies its own assertions, not that the change is wired to reality. Run the artifact and watch the change happen at its surface (`skills/surface-verification/SKILL.md`). |
 | "I'll check with the human if this looks good so far" | Mid-loop permission-seeking re-inserts the human into the cycle. Verify against the criteria and ship. |
 | "The status says done, so it's done" | Statuses go stale. Verify against the code. |
 | "I'll update the docs in a follow-up" | The follow-up never comes. Same change, same PR. |
@@ -570,7 +586,105 @@ Severity scale (Nielsen, 0-4):
 If the change touches anything user-facing, run the table above against the changed screens and report findings in the evaluation format: `location · heuristic · why · severity · fix`. Findings of severity 3+ block the ship.
 TEMPLATE_EOF
 
-# ── 9. sub-agent — reviewer ─────────────────────────────
+# ── 9. skill — surface verification ─────────────────────────────
+write_if_missing "skills/surface-verification/SKILL.md" << 'TEMPLATE_EOF'
+---
+name: surface-verification
+description: Use before claiming any change works — verification is runtime observation at the surface where users meet the change, not test runs. Required in Phase 5 for every change with a runtime surface.
+---
+
+# surface-verification
+
+**Verification is runtime observation.** You run the artifact, drive it to
+where the changed code executes, and capture what you see. That capture is
+your evidence. Nothing else is.
+
+Tests, typecheck, lint, and build are CI's job — run them, but they prove
+the change *compiles and satisfies its own assertions*, not that it works.
+A change can be fully green and still invisible, inert, or wrong at the
+surface, because tests pin what the author believed, not what the user sees.
+The two failure classes are different: CI catches "the code broke a
+contract"; only observation catches "the contract was never wired to
+reality."
+
+## The rule
+
+For every change with a runtime surface, the ship gate requires **captured
+evidence from the running artifact** — terminal output, response bodies,
+screenshots, logs of observed behavior. "Tests pass" is not evidence of
+working. Neither is "I read the code and it's correct" — reading code is
+how the gap got shipped.
+
+## Find the surface
+
+The surface is where a user — human or programmatic — meets the change.
+That's where you observe.
+
+| Change reaches | Surface | You |
+|---|---|---|
+| CLI / TUI | terminal | run the command, capture the output |
+| Server / API | socket | send the request, capture the response |
+| GUI / web UI | pixels | drive it (headless browser if needed), screenshot |
+| Library | package boundary | call through the public export, not internals |
+| Prompt / agent config | the agent | run the agent, capture its behavior |
+| Scheduled job / workflow | the runner | trigger it, read the run |
+
+An internal function is not a surface — something calls it, and that caller
+ends at one of the rows above. Follow it there. If no runtime surface
+exists (docs-only, types-only, tests-only), say so explicitly: **SKIP — no
+runtime surface** is a legitimate verdict; a test run standing in for
+observation is not.
+
+## Drive it
+
+Take the smallest path that makes the changed code execute:
+
+- Changed a flag? Run with it.
+- Changed a handler? Hit that route.
+- Changed error handling? Trigger the error.
+- Changed UI state? Drive the UI into that state and look at it.
+
+End-to-end, through the real interface. Pieces passing in isolation does
+not mean the flow works — seams are where bugs hide. If users click
+buttons, verify by clicking buttons, not by curling the API underneath.
+
+If the change touches destructive paths (deletes, publishes, sends,
+payments) and there is no dry-run or safe target, do not drive it live —
+verify around it and state plainly which path was not exercised and why.
+
+## Push on it
+
+Confirming the claim is the first half, not the job. You know exactly what
+changed — probe *around* it at the same surface: empty values, wrong
+methods, repeated actions, interrupts, stale state, the adjacent case the
+diff didn't touch. A probe that finds nothing is still a finding worth one
+line — it tells the reviewer what was covered.
+
+## Report candidly
+
+The verdict is binary and the evidence travels with it:
+
+- **WORKS** — you observed the change doing its job at the surface.
+- **DOESN'T** — you observed it failing, missing, or breaking something
+  else. Report it plainly with the capture, *then* fix and re-verify.
+  A found failure is the verification working, not a verification failure.
+- **BLOCKED** — you could not reach a state where the change is observable.
+  Say exactly where it stopped. Not a verdict on the change.
+- **SKIP** — no runtime surface exists. One line why.
+
+No partial pass: "3 of 4 scenarios worked" is DOESN'T until the fourth
+works or is explained away. Ambiguous output is DOESN'T with the raw
+capture attached — don't interpret in the change's favor. When in doubt,
+the change doesn't work: a false WORKS ships broken behavior; a false
+DOESN'T costs one more look.
+
+Observations beyond the verdict are the signal: anything that made you
+pause, work around, or go "huh" is information the author doesn't have.
+Surprises found while observing become laundry-list items, not silent
+fixes.
+TEMPLATE_EOF
+
+# ── 10. sub-agent — reviewer ─────────────────────────────
 write_if_missing ".agents/reviewer.md" << 'TEMPLATE_EOF'
 # reviewer
 
@@ -590,7 +704,7 @@ A code review sub-agent that evaluates work done by the primary agent.
 - **blocked**: critical issue that must be addressed before merging
 TEMPLATE_EOF
 
-# ── 10. sub-agent — security auditor ─────────────────────────────
+# ── 11. sub-agent — security auditor ─────────────────────────────
 write_if_missing ".agents/security-auditor.md" << 'TEMPLATE_EOF'
 # security-auditor
 
@@ -609,7 +723,7 @@ Security audit sub-agent for changes touching auth, APIs, or user input.
 - **blocked**: must-fix issue with file:line and remediation
 TEMPLATE_EOF
 
-# ── 11. automation — scheduled triage ─────────────────────────────
+# ── 12. automation — scheduled triage ─────────────────────────────
 write_if_missing ".github/workflows/loop-triage.yml" << 'TEMPLATE_EOF'
 name: loop-triage
 
@@ -649,7 +763,7 @@ jobs:
           fi
 TEMPLATE_EOF
 
-# ── 12. .gitignore ───────────────────────────────────────────────────
+# ── 13. .gitignore ───────────────────────────────────────────────────
 write_if_missing ".gitignore" << 'TEMPLATE_EOF'
 node_modules/
 dist/
@@ -658,7 +772,7 @@ dist/
 .DS_Store
 TEMPLATE_EOF
 
-# ── 13. Claude Code skill discovery ──────────────────────────────────
+# ── 14. Claude Code skill discovery ──────────────────────────────────
 # Relative symlinks so skills are discovered natively by Claude Code.
 # Committed to the repo on purpose: the loop's setup should be portable,
 # not per-machine. Harmless for other agent tools.
@@ -683,6 +797,7 @@ echo "  docs/done_laundry_list.md         ← completed items"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"
+echo "  skills/surface-verification/      ← runtime-observation verification skill"
 echo "  .agents/reviewer.md               ← code review sub-agent"
 echo "  .agents/security-auditor.md       ← security audit sub-agent"
 echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"
