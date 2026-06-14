@@ -70,10 +70,10 @@ The human engineers the loop, not its per-cycle prompter. Exactly two gates: **F
 Follow the phased operating loop in `SESSION.md` — it is the canonical session protocol.
 
 In summary:
-1. **Sync**: `git pull origin <branch>`.
+1. **Pre-flight**: Check open PRs (QA + merge if clean), prune merged worktrees, sync main.
 2. **Start**: Read `STATE.md`, `docs/laundry_list.md`, `docs/done_laundry_list.md`.
-3. **Phase 1-3**: Gather evidence, build candidates, commit to one item (Frame gate).
-4. **Phase 4-5**: Implement, verify, review, evaluate.
+3. **Phase 1-3**: Gather evidence, build vertical candidates, commit to a vertical (Frame gate).
+4. **Phase 4-5**: Implement (fan out agents for independent items), verify, review, evaluate.
 5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/laundry_list.md` to `docs/done_laundry_list.md`.
 6. **Ship**: Feature branch, conventional commit, PR with verification evidence (Ship gate).
 7. **Loop**: If exit criteria not met, return to step 2.
@@ -91,6 +91,8 @@ These thoughts mean stop — you're rationalizing:
 | "I'll check with the human if this looks good so far" | Mid-loop permission-seeking re-inserts the human into the cycle. Verify against the criteria and ship. |
 | "The status says done, so it's done" | Statuses go stale. Verify against the code. |
 | "I'll update the docs in a follow-up" | The follow-up never comes. Same change, same PR. |
+| "Want me to fix this?" / "Should I knock these out?" | Mid-loop suggestion re-inserts the human gate. Work is done → backlog is updated → stop. The human reads the backlog and decides what's next. |
+| "I'll pick the single most important item" | Prefer a Loop Vertical — a group of thematically cohesive items that deliver more together. Single-item thinking under-uses parallelism and misses compound impact. |
 
 ### Comprehension Debt
 
