@@ -28,6 +28,12 @@ write_if_missing() {
 
 # ── 1. SESSION.md — session-start prompt ─────────────────────────────
 write_if_missing "SESSION.md" << 'TEMPLATE_EOF'
+# "go" / "loop" — what this trigger activates
+
+When a human says "go" or "loop", run this full protocol from Phase 0 through Ship without interruption. No confirmation between phases. The two human gates (Frame and Ship) are the only stops.
+
+---
+
 # Session start
 
 Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
@@ -38,9 +44,9 @@ Then read `STATE.md` and `docs/laundry_list.md` to understand current state and 
 
 # Objective
 
-Deliver one complete item from `docs/laundry_list.md` and leave it in a merge-ready state.
+Deliver a complete Loop Vertical — a thematically cohesive group of items from `docs/laundry_list.md` — and leave it in a merge-ready state.
 
-Optimize for the highest-impact user-facing outcome. If no items are clear, audit the codebase and populate `docs/laundry_list.md` with findings.
+Optimize for the highest collective user/operator impact. Fan out to parallel agents for independent items within the vertical. If no items are clear, audit the codebase and populate `docs/laundry_list.md` with findings.
 
 ---
 
@@ -48,16 +54,39 @@ Optimize for the highest-impact user-facing outcome. If no items are clear, audi
 
 The human engineers the loop; the loop runs the work. The human is involved at exactly two points:
 
-1. **Frame gate** (end of Phase 3) — if the selected item is ambiguous, has multiple valid interpretations, or touches the STOP list, ask before writing code. Questions before work are cheap; questions after mistakes are expensive.
+1. **Frame gate** (end of Phase 3) — if the selected vertical is ambiguous, has multiple valid interpretations, or any item touches the STOP list, ask before writing code. Questions before work are cheap; questions after mistakes are expensive.
 2. **Ship gate** (the PR) — the human reviews finished, verified work with evidence attached.
 
-Between the gates, run to completion. Do not stop to ask "shall I proceed?", present intermediate artifacts for sign-off, or request permission between phases. Once framing is settled, it converts into acceptance criteria and the loop runs autonomously through implement → verify → ship. The only legitimate mid-loop stop is being blocked on input only the human has.
+Between the gates, run to completion. Do not stop to ask "shall I proceed?", present intermediate artifacts for sign-off, request permission between phases, or volunteer "want me to fix these?" after completing a task. Once framing is settled, it converts into acceptance criteria and the loop runs autonomously through implement → verify → ship. The only legitimate mid-loop stop is being blocked on input only the human has.
 
 ---
 
 # Operating Loop
 
 Remain in the following loop until exit criteria are satisfied.
+
+## Phase 0: Pre-flight
+
+Before picking new work, clean up anything in-flight and sync the repo.
+
+### 1. Open PRs
+Run `gh pr list` (or equivalent). For each open PR:
+- Check out the branch, run the project's validation suite (typecheck, lint, tests).
+- If clean: report it as ready for approval. Merge only with explicit approval (see Non-Negotiable Rules).
+- If failing: add a laundry item capturing the failure, leave the PR open, continue.
+
+### 2. Open worktrees
+Run `git worktree list`. For each worktree that isn't `<default-branch>`:
+- If uncommitted work exists: surface it to the human before proceeding (this is the only legitimate pre-flight stop).
+- If clean and branch is merged: prune with `git worktree remove`.
+
+### 3. Sync the default branch
+```
+git checkout <default-branch> && git pull origin <default-branch>
+```
+Start all new work from a clean, up-to-date `<default-branch>`.
+
+---
 
 ## Phase 1: Gather Evidence
 
@@ -77,57 +106,63 @@ Before proposing work:
 
 ---
 
-## Phase 2: Build Candidates
+## Phase 2: Build Candidates (Loop Vertical)
 
-Identify the top candidate items from `docs/laundry_list.md`.
+A **Loop Vertical** is a group of laundry items that are thematically cohesive and deliver a more meaningful outcome together than any one item alone. Examples: "pipeline observability fixes", "doc accuracy corrections", "auth hardening", "onboarding UX pass".
 
-For each candidate, note:
-- user-facing impact
-- dependencies
-- risk level
-- affected files
-- verification scope
+Identify the top 2–3 candidate verticals. For each, note:
+- The items it groups and their collective user/operator impact
+- Whether items within it are independent (can fan out to parallel agents) or sequential
+- Dependencies and risks
+- Estimated scope
 
 Rank by:
-1. User impact
-2. Priority/severity
-3. Readiness (dependencies met, blocked on nothing)
-4. Implementation efficiency
+1. Collective user/operator impact
+2. Readiness (no unresolved blockers across the group)
+3. Implementation efficiency (high parallelism = faster vertical completion)
 
-Explicitly state why lower-ranked candidates were rejected.
+Explicitly state why lower-ranked verticals were rejected.
 
 ---
 
-## Phase 3: Commit to One Item
+## Phase 3: Commit to a Vertical
 
 Before coding, record:
 
-### Selected Item
-- what it is
-- rationale for selection
-- dependencies verified
-- files expected to change
+### Selected Vertical
+- Name and theme
+- Items included (list each, with acceptance criteria)
+- Which items are independent (fan-out candidates) vs sequential
+- Files expected to change
+- Rationale for selection
 
 ### Out of Scope
 List what will not be touched.
 
-### Acceptance Criteria
-For the item:
-- required behavior
-- tests required (if any)
-- verification required
+### Execution Plan
+For independent items: fan out to parallel sub-agents, one per item or domain. Brief each agent with: its specific item, acceptance criteria, constraints, and expected output. Coordinate results before integrating.
 
-This is the Frame gate. If work touches:
+For sequential items: work in order. Complete and verify each before starting the next.
+
+This is the Frame gate. If any item in the vertical touches:
 - payments/billing
 - auth/access control
 - data deletion
 - irreversible public behavior
 
-STOP and request approval. Likewise ask now if the item is ambiguous or has multiple valid interpretations. Otherwise proceed — no further check-ins until the PR.
+STOP and request approval. Likewise ask now if the vertical selection is ambiguous or any item has multiple valid interpretations. Otherwise proceed — no further check-ins until the PR.
 
 ---
 
 ## Phase 4: Implement
+
+If the vertical contains independent items, dispatch sub-agents now — one per item or domain. Give each agent:
+- The specific item and its acceptance criteria
+- The files it should touch
+- Explicit constraints (what not to touch)
+- Expected output (summary of what was found/fixed)
+
+Coordinate results when agents return. Check for conflicts. Then integrate.
 
 Work incrementally. After each meaningful change:
 1. Re-read affected code.
@@ -174,7 +209,7 @@ The work is graded by a pass that did not write it:
 
 ### Evaluate
 Ask:
-- Did the change satisfy the acceptance criteria?
+- Did the change satisfy the acceptance criteria for every item in the vertical?
 - Did it introduce new work?
 - Did it invalidate remaining items?
 
@@ -184,18 +219,18 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 
 # Non-Negotiable Rules
 
-- Never commit directly to `main`. Use a feature branch.
+- Never commit directly to `<default-branch>`. Use a feature branch.
 - Never merge without approval.
 - Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven) and project conventions.
-- No refactoring beyond what the selected item requires.
+- No refactoring beyond what the selected vertical requires.
 - When modifying API behavior, update `.env.example`, docs, and README.
 
 ---
 
 # Bookkeeping
 
-When an item is complete:
-1. Move it from `docs/laundry_list.md` to `docs/done_laundry_list.md`
+When items are complete:
+1. Move each completed item from `docs/laundry_list.md` to `docs/done_laundry_list.md`
 2. Preserve all content — add completion date and implementation notes
 3. Never delete items; always move
 
@@ -220,7 +255,7 @@ The human reviews the finished PR, not intermediate artifacts.
 # Exit Criteria
 
 Do not declare success until ALL are true:
-- acceptance criteria satisfied
+- acceptance criteria satisfied for every item in the vertical
 - dependencies verified
 - validation passing (typecheck, lint, tests)
 - surface observation captured (or "no runtime surface" stated explicitly)
@@ -307,10 +342,10 @@ The human engineers the loop, not its per-cycle prompter. Exactly two gates: **F
 Follow the phased operating loop in `SESSION.md` — it is the canonical session protocol.
 
 In summary:
-1. **Sync**: `git pull origin <branch>`.
+1. **Pre-flight**: Check open PRs (QA; merge only with approval), prune merged worktrees, sync `<default-branch>`.
 2. **Start**: Read `STATE.md`, `docs/laundry_list.md`, `docs/done_laundry_list.md`.
-3. **Phase 1-3**: Gather evidence, build candidates, commit to one item (Frame gate).
-4. **Phase 4-5**: Implement, verify, review, evaluate.
+3. **Phase 1-3**: Gather evidence, build vertical candidates, commit to a vertical (Frame gate).
+4. **Phase 4-5**: Implement (fan out agents for independent items), verify, review, evaluate.
 5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/laundry_list.md` to `docs/done_laundry_list.md`.
 6. **Ship**: Feature branch, conventional commit, PR with verification evidence (Ship gate).
 7. **Loop**: If exit criteria not met, return to step 2.
@@ -328,6 +363,8 @@ These thoughts mean stop — you're rationalizing:
 | "I'll check with the human if this looks good so far" | Mid-loop permission-seeking re-inserts the human into the cycle. Verify against the criteria and ship. |
 | "The status says done, so it's done" | Statuses go stale. Verify against the code. |
 | "I'll update the docs in a follow-up" | The follow-up never comes. Same change, same PR. |
+| "Want me to fix this?" / "Should I knock these out?" | Mid-loop suggestion re-inserts the human gate. Work is done → backlog is updated → stop. The human reads the backlog and decides what's next. |
+| "I'll pick the single most important item" | Prefer a Loop Vertical — a group of thematically cohesive items that deliver more together. Single-item thinking under-uses parallelism and misses compound impact. |
 
 ### Comprehension Debt
 
@@ -744,7 +781,9 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
       - name: Open or update the triage issue
         env:
           GH_TOKEN: ${{ github.token }}
