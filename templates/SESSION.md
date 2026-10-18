@@ -42,19 +42,19 @@ Before picking new work, clean up anything in-flight and sync the repo.
 ### 1. Open PRs
 Run `gh pr list` (or equivalent). For each open PR:
 - Check out the branch, run the project's validation suite (typecheck, lint, tests).
-- If clean: merge it, delete the branch.
+- If clean: report it as ready for approval. Merge only with explicit approval (see Non-Negotiable Rules).
 - If failing: add a laundry item capturing the failure, leave the PR open, continue.
 
 ### 2. Open worktrees
-Run `git worktree list`. For each worktree that isn't `main`:
+Run `git worktree list`. For each worktree that isn't `<default-branch>`:
 - If uncommitted work exists: surface it to the human before proceeding (this is the only legitimate pre-flight stop).
 - If clean and branch is merged: prune with `git worktree remove`.
 
-### 3. Sync main
+### 3. Sync the default branch
 ```
-git checkout main && git pull origin main
+git checkout <default-branch> && git pull origin <default-branch>
 ```
-Start all new work from a clean, up-to-date main.
+Start all new work from a clean, up-to-date `<default-branch>`.
 
 ---
 
@@ -189,7 +189,7 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 
 # Non-Negotiable Rules
 
-- Never commit directly to `main`. Use a feature branch.
+- Never commit directly to `<default-branch>`. Use a feature branch.
 - Never merge without approval.
 - Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven) and project conventions.
 - No refactoring beyond what the selected vertical requires.
