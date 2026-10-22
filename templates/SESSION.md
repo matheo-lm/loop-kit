@@ -8,7 +8,7 @@ When a human says "go" or "loop", run this full protocol from Phase 0 through Sh
 
 Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
 
-Then read `STATE.md` and `docs/laundry_list.md` to understand current state and priorities.
+Then read `STATE.md` and `docs/laundry_list.md` to understand current state and priorities. If this session is part of the laundry-list chain, read `docs/laundry-chain.md` and run its start checks first.
 
 ---
 
@@ -114,13 +114,14 @@ For independent items: fan out to parallel sub-agents, one per item or domain. B
 
 For sequential items: work in order. Complete and verify each before starting the next.
 
-This is the Frame gate. If any item in the vertical touches:
+This is the Frame gate. If any item in the vertical touches the Stay the Engineer list in `AGENTS.md`:
+- production writes (migrations, data changes, ingestion, paid batch jobs)
 - payments/billing
 - auth/access control
 - data deletion
-- irreversible public behavior
+- publishing outward or other irreversible public behavior
 
-STOP and request approval. Likewise ask now if the vertical selection is ambiguous or any item has multiple valid interpretations. Otherwise proceed — no further check-ins until the PR.
+STOP and request approval. Likewise ask now if any item has multiple valid interpretations. Ask with the structured question tool, recommend one option, and batch the questions into one call. Choosing the vertical is not a question for the human: pick it and state why. If nobody answers, record the question in the item, leave that item open and continue with the rest. Otherwise proceed — no further check-ins until the PR.
 
 ---
 
@@ -155,7 +156,7 @@ Run the project's validation:
 - lint
 - build (when applicable)
 
-Do not fix unrelated failures.
+Run narrow tests for touched areas first, then the full suite from a clean environment (`env -i PATH="$PATH" HOME="$HOME" <test command>`) when the session environment carries production keys. Do not fix unrelated failures.
 
 ### Observe at the surface
 Validation proves the change compiles and satisfies its own assertions — not
@@ -190,7 +191,7 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 # Non-Negotiable Rules
 
 - Never commit directly to `<default-branch>`. Use a feature branch.
-- Never merge without approval.
+- Never merge without approval. The only exception is a chain session whose `docs/laundry-chain.md` working agreement records the human's autonomous-merge decision, and only under its conditions.
 - Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven) and project conventions.
 - No refactoring beyond what the selected vertical requires.
 - When modifying API behavior, update `.env.example`, docs, and README.
@@ -199,14 +200,13 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 
 # Bookkeeping
 
-When items are complete:
-1. Move each completed item from `docs/laundry_list.md` to `docs/done_laundry_list.md`
-2. Preserve all content — add completion date and implementation notes
-3. Never delete items; always move
-
-If new work is discovered:
-- Add it to `docs/laundry_list.md` with severity and location
-- Never leave findings only in conversation
+The laundry lists are the loop's memory; keep them truthful:
+- **Truth in the same change.** Any PR that changes reality updates the affected item's status in the same commit.
+- **Absolute dates only.** `yyyy-mm-dd`, never "yesterday" or "last week".
+- **Blocks move whole.** Move each completed item in full from `docs/laundry_list.md` to `docs/done_laundry_list.md`, adding the completion date and evidence. Never delete or duplicate an item; reopened items move back with context.
+- **New work gets a number.** Follow-up work becomes a new numbered item with priority, status and location — never a TODO in code, a side note or silent scope creep in an existing item. Never leave findings only in conversation.
+- **One home per kind of fact.** Active work in the laundry list, completed work in the done list, doctrine in `AGENTS.md`, technical detail in docs. Point, don't restate.
+- **Chain sessions** also update "Queue" and "Chain log" in `docs/laundry-chain.md`.
 
 ---
 
@@ -217,6 +217,7 @@ Open a pull request (the Ship gate):
 - Verification evidence in the body — the commands you ran and their output, not assertions.
 - Surface observation in the body — what you watched the running artifact do, with the capture (or "no runtime surface").
 - If anything failed or was skipped, say so plainly.
+- Chain sessions title the PR `Chain N/<limit> — <theme> (<items>)` and open it as a draft at the first commit.
 
 The human reviews the finished PR, not intermediate artifacts.
 
