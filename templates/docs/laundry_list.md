@@ -1,39 +1,18 @@
 # laundry list
 
 the living memory of what needs love in this project. gaps, debts, and broken windows
-we know about. nothing here gets deleted — only moved to done when fixed.
+we know about. nothing here gets deleted — only moved whole to done when fixed.
 
-**read this before any session.** pick one item, fix it, mark it done.
+**read this before any session.** pick a vertical (2–5 related items), fix it, move the blocks to done.
 
----
-
-## ux/ui
-- [ ] item with location and description (severity)
-
-## code quality
-- [ ] item with location and description (severity)
-
-## security
-- [ ] item with location and description (severity)
-
-## testing & coverage
-- [ ] item with location and description (severity)
-
-## parity
-- [ ] item with location and description (severity)
-
-## config & infra
-- [ ] item with location and description (severity)
+every item gets the next free number and keeps it for life. dates are absolute (yyyy-mm-dd).
 
 ---
 
-## stats
-| area | count |
-|------|-------|
-| ux/ui | 0 |
-| code quality | 0 |
-| security | 0 |
-| testing | 0 |
-| parity | 0 |
-| config/infra | 0 |
-| **total** | **0** |
+### 1. [P1] short action statement
+
+**Status:** Open — <yyyy-mm-dd> <what is true now>. **Area:** <area>. **Location:** <files or routes>.
+Problem: <what is wrong and who it hurts>.
+Acceptance: <2–5 statements a checker could verify without you>.
+Validation: <commands, surface checks>.
+Risk: <low/medium/high and why>.

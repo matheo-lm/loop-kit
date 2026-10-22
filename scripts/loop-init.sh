@@ -38,7 +38,7 @@ When a human says "go" or "loop", run this full protocol from Phase 0 through Sh
 
 Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
 
-Then read `STATE.md` and `docs/laundry_list.md` to understand current state and priorities.
+Then read `STATE.md` and `docs/laundry_list.md` to understand current state and priorities. If this session is part of the laundry-list chain, read `docs/laundry-chain.md` and run its start checks first.
 
 ---
 
@@ -144,13 +144,14 @@ For independent items: fan out to parallel sub-agents, one per item or domain. B
 
 For sequential items: work in order. Complete and verify each before starting the next.
 
-This is the Frame gate. If any item in the vertical touches:
+This is the Frame gate. If any item in the vertical touches the Stay the Engineer list in `AGENTS.md`:
+- production writes (migrations, data changes, ingestion, paid batch jobs)
 - payments/billing
 - auth/access control
 - data deletion
-- irreversible public behavior
+- publishing outward or other irreversible public behavior
 
-STOP and request approval. Likewise ask now if the vertical selection is ambiguous or any item has multiple valid interpretations. Otherwise proceed — no further check-ins until the PR.
+STOP and request approval. Likewise ask now if any item has multiple valid interpretations. Ask with the structured question tool, recommend one option, and batch the questions into one call. Choosing the vertical is not a question for the human: pick it and state why. If nobody answers, record the question in the item, leave that item open and continue with the rest. Otherwise proceed — no further check-ins until the PR.
 
 ---
 
@@ -185,7 +186,7 @@ Run the project's validation:
 - lint
 - build (when applicable)
 
-Do not fix unrelated failures.
+Run narrow tests for touched areas first, then the full suite from a clean environment (`env -i PATH="$PATH" HOME="$HOME" <test command>`) when the session environment carries production keys. Do not fix unrelated failures.
 
 ### Observe at the surface
 Validation proves the change compiles and satisfies its own assertions — not
@@ -220,7 +221,7 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 # Non-Negotiable Rules
 
 - Never commit directly to `<default-branch>`. Use a feature branch.
-- Never merge without approval.
+- Never merge without approval. The only exception is a chain session whose `docs/laundry-chain.md` working agreement records the human's autonomous-merge decision, and only under its conditions.
 - Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven) and project conventions.
 - No refactoring beyond what the selected vertical requires.
 - When modifying API behavior, update `.env.example`, docs, and README.
@@ -229,14 +230,13 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 
 # Bookkeeping
 
-When items are complete:
-1. Move each completed item from `docs/laundry_list.md` to `docs/done_laundry_list.md`
-2. Preserve all content — add completion date and implementation notes
-3. Never delete items; always move
-
-If new work is discovered:
-- Add it to `docs/laundry_list.md` with severity and location
-- Never leave findings only in conversation
+The laundry lists are the loop's memory; keep them truthful:
+- **Truth in the same change.** Any PR that changes reality updates the affected item's status in the same commit.
+- **Absolute dates only.** `yyyy-mm-dd`, never "yesterday" or "last week".
+- **Blocks move whole.** Move each completed item in full from `docs/laundry_list.md` to `docs/done_laundry_list.md`, adding the completion date and evidence. Never delete or duplicate an item; reopened items move back with context.
+- **New work gets a number.** Follow-up work becomes a new numbered item with priority, status and location — never a TODO in code, a side note or silent scope creep in an existing item. Never leave findings only in conversation.
+- **One home per kind of fact.** Active work in the laundry list, completed work in the done list, doctrine in `AGENTS.md`, technical detail in docs. Point, don't restate.
+- **Chain sessions** also update "Queue" and "Chain log" in `docs/laundry-chain.md`.
 
 ---
 
@@ -247,6 +247,7 @@ Open a pull request (the Ship gate):
 - Verification evidence in the body — the commands you ran and their output, not assertions.
 - Surface observation in the body — what you watched the running artifact do, with the capture (or "no runtime surface").
 - If anything failed or was skipped, say so plainly.
+- Chain sessions title the PR `Chain N/<limit> — <theme> (<items>)` and open it as a draft at the first commit.
 
 The human reviews the finished PR, not intermediate artifacts.
 
@@ -337,6 +338,27 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 
 The human engineers the loop, not its per-cycle prompter. Exactly two gates: **Frame** (clarifying questions before code, when ambiguous or on the STOP list) and **Ship** (the PR, with verification evidence). Between them, run to completion — `SESSION.md` defines both gates.
 
+### Stay the Engineer (human-only decisions)
+
+Unattended loops make mistakes unattended. These stop the loop for an explicit human decision, even mid-run and regardless of approvals earlier in the session:
+- Production writes: migrations, data changes, ingestion runs, paid batch jobs. Ask each time; access to a system is not approval.
+- Deleting user data.
+- Payments and billing.
+- Auth and access control.
+- Publishing outward: email sends, broadcasts, social posts, anything external.
+- Overriding a decision already recorded in the backlog or docs.
+
+### Questions and Confidence
+
+- **Ask with the structured question tool** (Claude Code: AskUserQuestion), not buried in prose. Recommend one option and say why. Batch related questions into one call.
+- **Ask only what is the human's to decide.** Choosing the next item or vertical, how to implement it and what to do after it are the agent's job; do not hand them back as questions.
+- **Unanswered questions are recorded, never guessed.** If nobody answers (a scheduled run, an unattended chain), write the question into the item and the open-questions list, leave that item open, and finish the rest of the work.
+- **Confidence disclosure.** Whenever confidence in a response or solution is below 97%, append "Confidence Level x%" to the response.
+
+### Chains
+
+To work through the backlog across many sessions without prompting each one, run the laundry-list chain in `docs/laundry-chain.md`: one bundle per session, the PR title as a lock, a session limit, a queue and a chain log, and a hand-off that starts the next session.
+
 ### Session Ritual
 
 Follow the phased operating loop in `SESSION.md` — it is the canonical session protocol.
@@ -365,6 +387,9 @@ These thoughts mean stop — you're rationalizing:
 | "I'll update the docs in a follow-up" | The follow-up never comes. Same change, same PR. |
 | "Want me to fix this?" / "Should I knock these out?" | Mid-loop suggestion re-inserts the human gate. Work is done → backlog is updated → stop. The human reads the backlog and decides what's next. |
 | "I'll pick the single most important item" | Prefer a Loop Vertical — a group of thematically cohesive items that deliver more together. Single-item thinking under-uses parallelism and misses compound impact. |
+| "Which item would you like me to pick?" | Choosing the work is the agent's job. Pick, state why, and run the loop; ask only what is the human's to decide. |
+| "I'll guess what they'd want" (no one answering) | Record the question, leave that item open, finish the rest. |
+| "I'm fairly sure" | Below 97%, say "Confidence Level x%". |
 
 ### Comprehension Debt
 
@@ -423,42 +448,21 @@ write_if_missing "docs/laundry_list.md" << 'TEMPLATE_EOF'
 # laundry list
 
 the living memory of what needs love in this project. gaps, debts, and broken windows
-we know about. nothing here gets deleted — only moved to done when fixed.
+we know about. nothing here gets deleted — only moved whole to done when fixed.
 
-**read this before any session.** pick one item, fix it, mark it done.
+**read this before any session.** pick a vertical (2–5 related items), fix it, move the blocks to done.
 
----
-
-## ux/ui
-- [ ] item with location and description (severity)
-
-## code quality
-- [ ] item with location and description (severity)
-
-## security
-- [ ] item with location and description (severity)
-
-## testing & coverage
-- [ ] item with location and description (severity)
-
-## parity
-- [ ] item with location and description (severity)
-
-## config & infra
-- [ ] item with location and description (severity)
+every item gets the next free number and keeps it for life. dates are absolute (yyyy-mm-dd).
 
 ---
 
-## stats
-| area | count |
-|------|-------|
-| ux/ui | 0 |
-| code quality | 0 |
-| security | 0 |
-| testing | 0 |
-| parity | 0 |
-| config/infra | 0 |
-| **total** | **0** |
+### 1. [P1] short action statement
+
+**Status:** Open — <yyyy-mm-dd> <what is true now>. **Area:** <area>. **Location:** <files or routes>.
+Problem: <what is wrong and who it hurts>.
+Acceptance: <2–5 statements a checker could verify without you>.
+Validation: <commands, surface checks>.
+Risk: <low/medium/high and why>.
 TEMPLATE_EOF
 
 # ── 5. docs/done_laundry_list.md — completed items ─────────────────────────────
@@ -474,6 +478,78 @@ completed items from `docs/laundry_list.md`. nothing is deleted — only moved h
 | date completed | area | original item | notes |
 |----------------|------|---------------|-------|
 | yyyy-mm-dd | ux/ui | item text | implementation notes |
+TEMPLATE_EOF
+
+# ── 5b. docs/laundry-chain.md — multi-session chain brief ─────────────────────────────
+write_if_missing "docs/laundry-chain.md" << 'TEMPLATE_EOF'
+# Laundry-list chain
+
+Internal. This is the standing brief for a chain of agent sessions that works through `docs/laundry_list.md` one bundle at a time. Every chain session reads it first and updates "Queue" and "Chain log" in its own PR. `AGENTS.md` stays the source of truth for project rules; the working agreement below adds the human's standing decisions for chain sessions.
+
+## Start a session
+
+Start a new agent session on this repository with this one-line prompt:
+
+> Continue the laundry-list chain: read docs/laundry-chain.md and run the next session.
+
+The session runs the start checks below, takes the first bundle under "Queue" and follows everything else here. To keep the chain going without starting each session yourself, schedule a daily run (for Claude Code, a scheduled task that starts a fresh session with the same prompt). The start checks keep a scheduled run and a spawned session from working at the same time.
+
+## Start checks (every session, before any work)
+
+1. **One chain session at a time.** List open pull requests. If any open PR's title starts with `Chain `, another chain session is still working or waiting to merge. Stop, and report that PR and its state.
+2. **Session number.** N is the highest session number in "Chain log" plus 1. If N is above <limit> (the human raises this number to continue), stop and post the final report (see Hand-off).
+3. **Queue.** If "Queue" holds no agent-doable bundle, stop and post the final report.
+4. **Title.** Name the branch's PR `Chain N/<limit> — <theme> (<items>)`. The PR title is the lock that check 1 reads, so open the draft PR as soon as the branch has its first commit.
+
+## Working agreement (<human>, <yyyy-mm-dd>)
+
+- **Questions.** Ask with the agent's structured question tool (Claude Code: AskUserQuestion), never buried in plain text. Recommend one option and say why. Ask whenever a decision is the human's, and before overriding an earlier recorded decision. If a question gets no answer in the session (for example, a scheduled run nobody is watching), do not guess: record it under "Open questions" below and in the item, leave that item open, and finish the rest of the bundle.
+- **Merges.** <Choose one and delete the other.>
+  - Approval-gated: chain sessions stop at the Ship gate like any other session.
+  - Autonomous (human exception to the Ship gate, chain sessions only): squash-merge without asking when CI and the preview deployment are green, there is no conflict, and the review agent's findings are fixed. Then give a 5-line status and check production read-only.
+- **Production writes.** Ask before every production write (migration, data change, ingestion, paid batch job, outward send), each time. Access to a system is not approval.
+- **Style.** Factual and concise. Byte-cap command output. Append "Confidence Level x%" when confidence is below 97%.
+- **Off limits.** <items, PRs or areas chain sessions must not touch>.
+
+## Session procedure
+
+1. **Setup.** Fetch the default branch (the local ref can be stale), branch from it, install dependencies from the lockfile.
+2. **Work the bundle** with the operating loop in `SESSION.md`. Read each item in `docs/laundry_list.md` first and verify its status against code and git.
+3. **Verify.** Narrow tests first, then the full validation from a clean environment (`env -i PATH="$PATH" HOME="$HOME" <test command>` when the session environment carries production keys). For UI changes, attach before/after screenshots.
+4. **Review.** A separate review agent (`.agents/reviewer.md`, run in the background) checks the diff before merge. Fix its findings, and re-run it after large fixes.
+5. **Ship.** One branch and one draft PR per bundle. In the same PR, update docs and laundry state (move DONE blocks whole), give follow-up work new numbered items, and update this file:
+   - Remove the finished bundle from "Queue".
+   - Add one line to "Chain log".
+   - Triage the next bundle into "Queue" (rules below).
+6. **Merge** per the working agreement, check production read-only, then hand off.
+
+## Hand-off
+
+- **Pick the next bundle.** ONE bundle of 2–5 related items that agents can finish. Exclude paused, human-action-only, on-hold, design-first items and items owned by another open PR. Prefer coherent themes and higher priority.
+- **If such work remains and N is below <limit>:** start the next session (Claude Code cloud: the `create_session` tool with this repository as source, title `Chain N+1/<limit> — <theme> (<items>)` and the one-line prompt above). If spawning is refused (for example, a nesting limit), the queue is already up to date: end with the one-line prompt for the human, or rely on the scheduled run.
+- **Otherwise:** do not spawn. Post a final report listing what is left and why, each with the one thing the human must do.
+- **Last message:** the next session's title and ID, or the final report.
+
+## Queue
+
+1. **<theme> (<items>):** <one line on scope and anything the session must ask>.
+
+## Chain log
+
+| Session | Date | Bundle | PRs | Result |
+| --- | --- | --- | --- | --- |
+
+## Open questions
+
+None.
+
+## Open human actions
+
+None.
+
+## Environment notes
+
+<what sessions learned about the environment: blocked hosts, local stack setup, keys to unset>
 TEMPLATE_EOF
 
 # ── 6. skill — disciplined coding ─────────────────────────────
@@ -833,6 +909,7 @@ echo "  AGENTS.md                         ← operating model + principles (fill
 echo "  STATE.md                          ← session memory"
 echo "  docs/laundry_list.md              ← ranked backlog"
 echo "  docs/done_laundry_list.md         ← completed items"
+echo "  docs/laundry-chain.md             ← multi-session chain brief (fill in <placeholders>)"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"

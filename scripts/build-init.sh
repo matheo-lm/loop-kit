@@ -48,6 +48,7 @@ emit "AGENTS.md" "2. AGENTS.md — operating model" templates/AGENTS.md
 emit "STATE.md" "3. STATE.md — session memory" templates/STATE.md
 emit "docs/laundry_list.md" "4. docs/laundry_list.md — ranked backlog" templates/docs/laundry_list.md
 emit "docs/done_laundry_list.md" "5. docs/done_laundry_list.md — completed items" templates/docs/done_laundry_list.md
+emit "docs/laundry-chain.md" "5b. docs/laundry-chain.md — multi-session chain brief" templates/docs/laundry-chain.md
 emit "skills/disciplined-coding/SKILL.md" "6. skill — disciplined coding" templates/skills/disciplined-coding/SKILL.md
 emit "skills/design/SKILL.md" "7. skill — frontend design" templates/skills/design/SKILL.md
 emit "skills/usability-heuristics/SKILL.md" "8. skill — usability heuristics" templates/skills/usability-heuristics/SKILL.md
@@ -89,6 +90,7 @@ echo "  AGENTS.md                         ← operating model + principles (fill
 echo "  STATE.md                          ← session memory"
 echo "  docs/laundry_list.md              ← ranked backlog"
 echo "  docs/done_laundry_list.md         ← completed items"
+echo "  docs/laundry-chain.md             ← multi-session chain brief (fill in <placeholders>)"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"

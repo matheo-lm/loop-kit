@@ -29,8 +29,9 @@ Loop-kit gives you the five pieces, ready to drop in:
 | **Sub-agents** | `.agents/reviewer.md` | Maker/checker separation. One writes, a second verifies. |
 | **Automations** | `.github/workflows/loop-triage.yml` | Scheduled discovery and triage without human prompting. |
 | **Worktrees** | `AGENTS.md` | Documented `git worktree` pattern for parallel agents. |
+| **Chains** | `docs/laundry-chain.md` | Multi-session runs: one bundle per session, PR title as lock, session limit, queue, chain log, hand-off to the next session. |
 
-Plus the **Karpathy operating principles** at the top of `AGENTS.md` (think before coding, simplicity first, surgical changes, goal-driven execution) and the **two human gates** in `SESSION.md` (frame before code, ship at the PR — nothing in between).
+Plus the **Karpathy operating principles** at the top of `AGENTS.md` (think before coding, simplicity first, surgical changes, goal-driven execution) and the **two human gates** in `SESSION.md` (frame before code, ship at the PR — nothing in between). `AGENTS.md` also carries the **stay-the-engineer** list (production writes asked each time, outward publishing, data deletion, payments, auth), the **question rules** (structured question tool, one recommended option, unanswered questions recorded instead of guessed) and **confidence disclosure** ("Confidence Level x%" whenever confidence is below 97%).
 
 ---
 
@@ -44,6 +45,7 @@ AGENTS.md                         ← operating model + principles
 STATE.md                          ← session memory
 docs/laundry_list.md              ← ranked backlog / quality gap tracker
 docs/done_laundry_list.md         ← completed items archive
+docs/laundry-chain.md             ← multi-session chain brief
 skills/disciplined-coding/SKILL.md ← disciplined coding skill
 skills/design/SKILL.md            ← frontend design skill
 skills/usability-heuristics/SKILL.md ← usability evaluation skill
@@ -131,6 +133,16 @@ Every skill carries YAML frontmatter (`name`, `description`) so agent tools can 
 ```bash
 ln -s ../../skills/<name> .claude/skills/<name>
 ```
+
+### Run a chain
+
+Fill in the placeholders in `docs/laundry-chain.md` (session limit, merge policy, off-limits work), seed "Queue" with the first bundle, then start a session with:
+
+```
+Continue the laundry-list chain: read docs/laundry-chain.md and run the next session.
+```
+
+Each session runs one bundle, logs it, queues the next and starts the next session. A daily scheduled run with the same prompt keeps it going; the PR-title lock stops two sessions from overlapping.
 
 ---
 
