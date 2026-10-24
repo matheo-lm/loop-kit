@@ -60,7 +60,7 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/` (agent-agnostic; for Claude Code, copy or symlink into `.claude/agents/`). The agent that writes is never the sole agent that grades.
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting. `.github/workflows/loop-triage.yml` surfaces open laundry-list items as a recurring issue; enable its cron when the list is trustworthy.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
-6. **Human attention** — Every human-only need is an `human-action` issue (one queue for the human); the bar in `skills/human-attention/SKILL.md` sets its severity, and the scheduled check in `docs/attention-check.md` is the only thing that reaches the human, with rate limits. Answers come back as recorded decisions. Agents never notify the human directly.
+6. **Human attention** — Every human-only need is a `human-action` issue (one queue for the human); the bar in `skills/human-attention/SKILL.md` sets its severity, and the scheduled check in `docs/attention-check.md` is the only thing that reaches the human, with rate limits. Answers come back as recorded decisions. Agents never notify the human directly.
 
 ### The Two Human Gates
 
@@ -119,7 +119,7 @@ These thoughts mean stop — you're rationalizing:
 | "Which item would you like me to pick?" | Choosing the work is the agent's job. Pick, state why, and run the loop; ask only what is the human's to decide. |
 | "I'll guess what they'd want" (no one answering) | Record the question, leave that item open, finish the rest. |
 | "I'm fairly sure" | Below 97%, say "Confidence Level x%". |
-| "I'll ping the human" | Only the attention check reaches the human, and only for an `human-action` issue that met the bar. File or record; never notify. |
+| "I'll ping the human" | Only the attention check reaches the human, and only for a `human-action` issue that met the bar. File or record; never notify. |
 
 ### Comprehension Debt
 
