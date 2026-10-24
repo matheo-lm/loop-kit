@@ -41,6 +41,14 @@ jobs:
           test -f .agents/reviewer.md || { echo "missing reviewer"; exit 1; }
           test -f .agents/security-auditor.md || { echo "missing security-auditor"; exit 1; }
           test -f .github/workflows/loop-triage.yml || { echo "missing loop-triage workflow"; exit 1; }
+          test -f skills/human-attention/SKILL.md || { echo "missing human-attention skill"; exit 1; }
+          test -f docs/attention-check.md || { echo "missing attention-check prompt"; exit 1; }
+          test -f .github/ISSUE_TEMPLATE/human-action.md || { echo "missing human-action issue template"; exit 1; }
+          test -f docs/laundry-chain.md || { echo "missing laundry-chain doc"; exit 1; }
+          test -f docs/intake.md || { echo "missing intake prompt"; exit 1; }
+          test -f skills/intake/SKILL.md || { echo "missing intake skill"; exit 1; }
+          test -f docs/scheduled-tasks.md || { echo "missing scheduled-tasks registry"; exit 1; }
+          test -f docs/chain-task.md || { echo "missing chain-task prompt"; exit 1; }
           # regression: the kit must never leak its own templates/ layout into targets
           test ! -d templates || { echo "stray templates/ dir created in target"; exit 1; }
           # skills must carry discoverable frontmatter
