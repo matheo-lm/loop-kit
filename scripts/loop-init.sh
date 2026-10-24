@@ -896,12 +896,14 @@ The human is not the loop's per-cycle prompter and not its fallback. Every human
 File an issue when conditions 1, 4 and 5 below hold and the issue says what the agent did instead: the reversible default it took, or the item it deferred. File it as `severity:blocking` or `severity:critical` only when conditions 2 and 3 also hold; otherwise it is `severity:question`.
 
 1. **Human-only.** The need is on the Stay-the-Engineer list in `AGENTS.md`, or requires something only the human has: credentials, accounts, money, a legal or contractual reading, the human's identity (voice, name, face), or a decision the docs record as the human's.
-2. **Alternatives exhausted, in writing.** Each of these was tried or ruled out, and the issue says what happened: (a) another approach inside the item; (b) a reversible safe default, taken and recorded instead of asked; (c) deferring the item and doing other backlog work; (d) a recorded decision in the docs, laundry lists, done lists or chain log that already answers it.
+2. **Alternatives exhausted, in writing.** Each of these was tried or ruled out, and the issue says what happened: (a) the action itself, attempted, with the refusal quoted (the API message, the classifier reason or the UI-only setting; an issue is never filed on the assumption that something is refused); (b) another approach inside the item; (c) a reversible safe default, taken and recorded instead of asked; (d) deferring the item and doing other backlog work; (e) a recorded decision in the docs, laundry lists, done lists or chain log that already answers it.
 3. **It matters.** It blocks a P0 or P1 item or a whole vertical, or carries risk: money, security, legal, public exposure, data loss.
 4. **Not already open.** No open `human-action` issue covers it. Search first; add to the existing issue instead of opening a second.
 5. **One ask.** The issue asks for exactly one decision or one action, with options and a recommendation. Bundled asks are split or dropped.
 
 If condition 1, 4 or 5 fails: record the question in the item and `STATE.md`, leave the item open, finish the rest of the work. No issue, no notification.
+
+**Ask for the capability, not the chore.** When the blocker is a permission, scope, setting, credential or attachment the agent lacks, option A asks the human to grant it once (a permission rule, a token scope, a connector, a repository setting) so future runs act without them; the one-off action by the human is option B. When the capability cannot be granted (a platform limit the human does not control), the issue says so in one line, the limit is recorded once in the control repository's registry (`docs/scheduled-tasks.md`, "Environment facts"), and later issues point at that record instead of re-explaining it. The human is asked to do a chore only when no grant exists.
 
 ## Severity
 
@@ -919,7 +921,7 @@ Labels: `human-action` plus exactly one severity label; create them if missing. 
 
 1. **Decision or action needed**: one sentence, then options A, B, C with the recommended one first and why.
 2. **Why only you**: the rule, or the thing only the human has.
-3. **What was tried**: the four alternatives from the bar, each with what happened.
+3. **What was tried**: the five alternatives from the bar, each with what happened, the attempted action and its refusal first.
 4. **Impact of waiting**: the items and verticals blocked, and the date it starts to cost (a deadline, an expiring key, a policy date).
 5. **How to answer**: reply on the issue with the option letter or `done`. The next attention check records it and closes the issue. Nothing else is needed from the human.
 6. **Links**: the laundry item, the PR or run, the evidence.
@@ -957,6 +959,8 @@ Nothing here needs the human beyond the reply. Each repository that runs a chain
 | "The human will see it in chat" | Chat is not a record. The issue is. |
 | "I'll notify the human now" | Only the attention check reaches the human. Filers file. |
 | "They haven't answered, I'll guess" | Record the question, leave the item open, do other work. |
+| "I'll ask them to do it" | First try it and quote the refusal. Then ask them to make you able to do it; the chore is option B. |
+| "It was refused before, so it is human-only" | A refusal is a dated fact in the registry; try again when the environment changed. |
 TEMPLATE_EOF
 
 # ── 9c. skill — intake ─────────────────────────────
@@ -1122,6 +1126,8 @@ labels: human-action
 
 One sentence. Then options, recommended first:
 
+<!-- If the blocker is a capability the human can grant (a permission rule, a token scope, a connector, a repository setting), option A asks for the grant so future runs act alone; the one-off action is option B. -->
+
 - **A (recommended):** … because …
 - **B:** …
 - **C:** …
@@ -1132,6 +1138,7 @@ The Stay-the-Engineer rule, or the thing only the human has (credential, account
 
 ## What was tried
 
+- The action itself: attempted yyyy-mm-dd; refused with: … (the API message, the classifier reason or the UI-only setting)
 - Another approach inside the item: …
 - A reversible safe default: … (taken and recorded, or why none exists)
 - Deferring the item and doing other work: …
