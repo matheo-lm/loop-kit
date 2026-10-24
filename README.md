@@ -59,7 +59,7 @@ flowchart LR
   IN -->|"files items"| LL
   LL --> CHN --> PR -->|"merged"| LL
   CHN -->|"critical human-only need, after trying"| HA
-  HA --> AT -->|"critical now, blocking daily, questions weekly"| H
+  HA --> AT -->|"critical issues only, rate-limited"| H
   H -->|"answers on the issue"| HA
   AT -->|"records, closes"| LL
   REG -.- IN
