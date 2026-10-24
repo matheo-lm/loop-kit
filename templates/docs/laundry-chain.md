@@ -12,7 +12,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 
 ## Start checks (every session, before any work)
 
-1. **One chain session at a time.** List open pull requests. If any open PR's title starts with `Chain `, another chain session is still working or waiting to merge. Stop, and report that PR and its state.
+1. **One chain session at a time.** List open pull requests. If any open PR's title starts with `Chain `, another chain session is still working or waiting to merge. Stop, and report that PR and its state. Exception (human, 2026-10-24): if that PR's head commit is more than 3 hours old, the session that held it is dead (a run can die mid-bundle on the account's usage limit); check out its branch, continue its bundle and keep the PR as the lock, noting the adoption in the PR body and the Chain log.
 2. **Session number.** N is the highest session number in "Chain log" plus 1. If N is above <limit> (the human raises this number to continue), stop and post the final report (see Hand-off).
 3. **Queue.** If "Queue" holds no agent-doable bundle, stop and post the final report.
 4. **Title.** Name the branch's PR `Chain N/<limit> — <theme> (<items>)`. The PR title is the lock that check 1 reads, so open the draft PR as soon as the branch has its first commit.
