@@ -51,6 +51,7 @@ emit "docs/done_laundry_list.md" "5. docs/done_laundry_list.md — completed ite
 emit "docs/laundry-chain.md" "5b. docs/laundry-chain.md — multi-session chain brief" templates/docs/laundry-chain.md
 emit "docs/attention-check.md" "5c. docs/attention-check.md — scheduled human-attention check prompt" templates/docs/attention-check.md
 emit "docs/intake.md" "5d. docs/intake.md — scheduled intake check prompt" templates/docs/intake.md
+emit "docs/scheduled-tasks.md" "5e. docs/scheduled-tasks.md — registry of scheduled tasks" templates/docs/scheduled-tasks.md
 emit "skills/disciplined-coding/SKILL.md" "6. skill — disciplined coding" templates/skills/disciplined-coding/SKILL.md
 emit "skills/design/SKILL.md" "7. skill — frontend design" templates/skills/design/SKILL.md
 emit "skills/usability-heuristics/SKILL.md" "8. skill — usability heuristics" templates/skills/usability-heuristics/SKILL.md
@@ -98,6 +99,7 @@ echo "  docs/done_laundry_list.md         ← completed items"
 echo "  docs/laundry-chain.md             ← multi-session chain brief (fill in <placeholders>)"
 echo "  docs/attention-check.md           ← human-attention check prompt (fill in <placeholders>, schedule it hourly)"
 echo "  docs/intake.md                    ← intake check prompt (fill in <placeholders>, schedule it every few hours with the Slack connector)"
+echo "  docs/scheduled-tasks.md           ← registry of scheduled tasks (fill in; one per loop)"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"

@@ -33,6 +33,10 @@ Loop-kit gives you the pieces, ready to drop in:
 | **Human attention** | `skills/human-attention/SKILL.md`, `.github/ISSUE_TEMPLATE/human-action.md`, `docs/attention-check.md` | The human is reached only through `human-action` issues that meet a five-point bar, by a scheduled hourly check with rate limits (critical now, blocking in a daily digest, questions never pushed). Answers come back as recorded decisions. |
 | **Intake** | `skills/intake/SKILL.md`, `docs/intake.md` | The human dumps thoughts, bugs, ideas and feedback in one private Slack channel; a scheduled check turns each message into a laundry item in the right repository after a gap analysis, asks in the thread when the ask is unclear, and never does the work. |
 
+### One control repository for many
+
+When one person runs the loop across several repositories, the two cross-repository pieces live once: the human-attention check and the intake check run from a private **control repository**, which also keeps `docs/scheduled-tasks.md`, the registry of every scheduled task (id, schedule, repositories and connectors attached, prompt source, environment facts learned from runs). Project repositories keep their own chain brief, `chain-task.md` and `human-attention` skill, because filing is local and chains are per repository. Cross-repository human-only needs are filed in the control repository.
+
 Plus the **Karpathy operating principles** at the top of `AGENTS.md` (think before coding, simplicity first, surgical changes, goal-driven execution) and the **two human gates** in `SESSION.md` (frame before code, ship at the PR — nothing in between). `AGENTS.md` also carries the **stay-the-engineer** list (production writes asked each time, outward publishing, data deletion, payments, auth), the **question rules** (structured question tool, one recommended option, unanswered questions recorded instead of guessed) and **confidence disclosure** ("Confidence Level x%" whenever confidence is below 97%).
 
 ---
@@ -50,6 +54,7 @@ docs/done_laundry_list.md         ← completed items archive
 docs/laundry-chain.md             ← multi-session chain brief
 docs/attention-check.md           ← human-attention check prompt (schedule it hourly)
 docs/intake.md                    ← intake check prompt (schedule it every few hours, Slack connector attached)
+docs/scheduled-tasks.md           ← registry of scheduled tasks (fill in; one per loop, in the control repository)
 skills/disciplined-coding/SKILL.md ← disciplined coding skill
 skills/design/SKILL.md            ← frontend design skill
 skills/usability-heuristics/SKILL.md ← usability evaluation skill
