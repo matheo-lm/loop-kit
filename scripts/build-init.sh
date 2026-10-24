@@ -49,13 +49,16 @@ emit "STATE.md" "3. STATE.md — session memory" templates/STATE.md
 emit "docs/laundry_list.md" "4. docs/laundry_list.md — ranked backlog" templates/docs/laundry_list.md
 emit "docs/done_laundry_list.md" "5. docs/done_laundry_list.md — completed items" templates/docs/done_laundry_list.md
 emit "docs/laundry-chain.md" "5b. docs/laundry-chain.md — multi-session chain brief" templates/docs/laundry-chain.md
+emit "docs/attention-check.md" "5c. docs/attention-check.md — scheduled human-attention check prompt" templates/docs/attention-check.md
 emit "skills/disciplined-coding/SKILL.md" "6. skill — disciplined coding" templates/skills/disciplined-coding/SKILL.md
 emit "skills/design/SKILL.md" "7. skill — frontend design" templates/skills/design/SKILL.md
 emit "skills/usability-heuristics/SKILL.md" "8. skill — usability heuristics" templates/skills/usability-heuristics/SKILL.md
 emit "skills/surface-verification/SKILL.md" "9. skill — surface verification" templates/skills/surface-verification/SKILL.md
+emit "skills/human-attention/SKILL.md" "9b. skill — human attention" templates/skills/human-attention/SKILL.md
 emit ".agents/reviewer.md" "10. sub-agent — reviewer" templates/.agents/reviewer.md
 emit ".agents/security-auditor.md" "11. sub-agent — security auditor" templates/.agents/security-auditor.md
 emit ".github/workflows/loop-triage.yml" "12. automation — scheduled triage" templates/.github/workflows/loop-triage.yml
+emit ".github/ISSUE_TEMPLATE/human-action.md" "12b. human attention — human-action issue template" templates/.github/ISSUE_TEMPLATE/human-action.md
 
 cat << 'FTR'
 
@@ -91,13 +94,16 @@ echo "  STATE.md                          ← session memory"
 echo "  docs/laundry_list.md              ← ranked backlog"
 echo "  docs/done_laundry_list.md         ← completed items"
 echo "  docs/laundry-chain.md             ← multi-session chain brief (fill in <placeholders>)"
+echo "  docs/attention-check.md           ← human-attention check prompt (fill in <placeholders>, schedule it hourly)"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"
 echo "  skills/surface-verification/      ← runtime-observation verification skill"
+echo "  skills/human-attention/           ← when and how the human is reached (human-action issues)"
 echo "  .agents/reviewer.md               ← code review sub-agent"
 echo "  .agents/security-auditor.md       ← security audit sub-agent"
 echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"
+echo "  .github/ISSUE_TEMPLATE/human-action.md ← human-action issue template"
 echo "  .claude/skills/*                  ← Claude Code skill symlinks (commit these)"
 echo ""
 echo "Next steps:"
@@ -105,7 +111,8 @@ echo "  1. Edit AGENTS.md — fill in <!-- TODO --> placeholders"
 echo "  2. Populate docs/laundry_list.md by auditing your codebase"
 echo "  3. Add project-specific skills under skills/<name>/SKILL.md"
 echo "  4. Enable the cron in .github/workflows/loop-triage.yml when the list is trustworthy"
-echo "  5. Commit: git add . && git commit -m 'feat: establish loop engineering operating model'"
+echo "  5. Fill in docs/attention-check.md and create the hourly scheduled task from it (push notification on)"
+echo "  6. Commit: git add . && git commit -m 'feat: establish loop engineering operating model'"
 echo ""
 echo "The loop is ready. Next session:"
 echo "  1. Give SESSION.md to your agent as the session-start prompt"

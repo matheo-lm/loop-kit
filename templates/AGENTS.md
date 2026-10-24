@@ -53,13 +53,14 @@ This project uses loop engineering as its operating model. The agent doesn't jus
 STATE.md → read memory → plan → implement → verify → update STATE.md → loop
 ```
 
-### The Five Pieces
+### The Six Pieces
 
 1. **Memory** — `STATE.md` tracks the current goal and blockers; `docs/laundry_list.md` is the ranked backlog and `docs/done_laundry_list.md` the archive. The agent reads them at session start and writes at session end. The model forgets; the repo doesn't.
 2. **Skills** — `skills/<name>/SKILL.md` files codify project knowledge so every agent doesn't re-derive it from zero. Conventions, build steps, rationale — written once, read every run. Each skill carries YAML frontmatter (`name`, `description`) so agent tools can discover it; for Claude Code, symlink skills into `.claude/skills/` (`ln -s ../../skills/<name> .claude/skills/<name>`).
 3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/` (agent-agnostic; for Claude Code, copy or symlink into `.claude/agents/`). The agent that writes is never the sole agent that grades.
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting. `.github/workflows/loop-triage.yml` surfaces open laundry-list items as a recurring issue; enable its cron when the list is trustworthy.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
+6. **Human attention** — Every human-only need is an `human-action` issue (one queue for the human); the bar in `skills/human-attention/SKILL.md` sets its severity, and the scheduled check in `docs/attention-check.md` is the only thing that reaches the human, with rate limits. Answers come back as recorded decisions. Agents never notify the human directly.
 
 ### The Two Human Gates
 
@@ -79,6 +80,7 @@ Unattended loops make mistakes unattended. These stop the loop for an explicit h
 
 - **Ask with the structured question tool** (Claude Code: AskUserQuestion), not buried in prose. Recommend one option and say why. Batch related questions into one call.
 - **Ask only what is the human's to decide.** Choosing the next item or vertical, how to implement it and what to do after it are the agent's job; do not hand them back as questions.
+- **Human-only needs become `human-action` issues** per `skills/human-attention/SKILL.md`: every one is recorded so the human has one queue; the bar decides its severity and whether the human is told. Nothing human-only lives only in chat.
 - **Unanswered questions are recorded, never guessed.** If nobody answers (a scheduled run, an unattended chain), write the question into the item and the open-questions list, leave that item open, and finish the rest of the work.
 - **Confidence disclosure.** Whenever confidence in a response or solution is below 97%, append "Confidence Level x%" to the response.
 
@@ -117,6 +119,7 @@ These thoughts mean stop — you're rationalizing:
 | "Which item would you like me to pick?" | Choosing the work is the agent's job. Pick, state why, and run the loop; ask only what is the human's to decide. |
 | "I'll guess what they'd want" (no one answering) | Record the question, leave that item open, finish the rest. |
 | "I'm fairly sure" | Below 97%, say "Confidence Level x%". |
+| "I'll ping the human" | Only the attention check reaches the human, and only for an `human-action` issue that met the bar. File or record; never notify. |
 
 ### Comprehension Debt
 
