@@ -198,7 +198,7 @@ Design the loop around these; none of them is a bug to work around.
 - The auto-mode permission classifier may refuse to store a task prompt that merges without review. Keep the prompt in a doc (`docs/chain-task.md`, `docs/attention-check.md`, `docs/intake.md`) and let the human paste it, or have them grant a permission rule for the trigger tools once.
 - GitHub GraphQL is unavailable (`gh issue`, `gh pr`, issue transfers); REST (`gh api`) works, and draft-to-ready goes through `POST repos/O/R/pulls/N/ccr/ready_for_review`. `gh auth status` reports the token as invalid while `gh api` works.
 - Agent tokens cannot write `.github/workflows/` (no `workflow` scope): stage workflow files under `workflows/` and let the human copy them. Repository-settings writes, repository creation and branch deletion through the API are refused by the proxy; turn on "Automatically delete head branches" per repository instead of deleting branches.
-- Routine sessions cannot fire other tasks; the schedule is the kick. A run that hits the account's usage limit fails within seconds and does nothing.
+- Routine-fired sessions have no `create_session` or `list_sessions`, so a scheduled task cannot dispatch other sessions: each task does its own work in place, and a running chain is known by its open draft PR (the lock), not by session tags. Whether a routine session can fire another task is unclear (one reported `fire_trigger` absent, another listed it among its tools); the schedule is the kick. A run that hits the account's usage limit fails within seconds and does nothing.
 
 ## Agent workflow
 

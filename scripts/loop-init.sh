@@ -533,7 +533,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 ## Hand-off
 
 - **Pick the next bundle.** ONE bundle of 2–5 related items that agents can finish. Exclude paused, human-action-only, on-hold, design-first items and items owned by another open PR. Prefer coherent themes and higher priority.
-- **If such work remains and N is below <limit>:** start the next session (Claude Code cloud: the `create_session` tool with this repository as source, title `Chain N+1/<limit> — <theme> (<items>)` and the one-line prompt above). If spawning is refused (for example, a nesting limit), the queue is already up to date: end with the one-line prompt for the human, or rely on the scheduled run.
+- **If such work remains and N is below <limit>:** a scheduled run does not spawn; the schedule starts the next session (routine-fired sessions have no `create_session` or `list_sessions`). A session started by hand may start the next one with `create_session` (this repository as source, title `Chain N+1/<limit> — <theme> (<items>)`, the one-line prompt above); if that is refused (for example, a nesting limit), the queue is already up to date: end with the one-line prompt for the human.
 - **Otherwise:** do not spawn. Post a final report listing what is left and why, each with the one thing the human must do. If an item meets the bar in `skills/human-attention/SKILL.md`, file the `human-action` issue; the attention check carries it from there.
 - **Last message:** the next session's title and ID, or the final report.
 
