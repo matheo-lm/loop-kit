@@ -559,6 +559,27 @@ Home: open `human-action` issues (`skills/human-attention/SKILL.md`). Link them 
 <what sessions learned about the environment: blocked hosts, local stack setup, keys to unset>
 TEMPLATE_EOF
 
+# ── 5b2. docs/chain-task.md — pasteable daily chain task prompt ─────────────────────────────
+write_if_missing "docs/chain-task.md" << 'TEMPLATE_EOF'
+# Chain task
+
+The prompt of the scheduled task `<repo>-chain` that starts this repository's daily chain session (`<schedule>`, a fresh session, this repository attached in the claude.ai Routines UI). This file is the source of truth: after a change here, the human pastes the text below the rule into the task's Edit dialog at https://claude.ai/code/routines (an unattended session's permission classifier refuses to store a prompt that merges without review, so an agent cannot update it; file a `human-action` issue carrying the new text). Fill in the placeholders; the checks and off-limits list must match `docs/laundry-chain.md`.
+
+---
+
+You are a chain session for <owner>/<repo>, started by a scheduled task. Nobody is watching. The repository is attached and cloned; work inside it.
+
+Read, in order: AGENTS.md, SESSION.md, STATE.md, docs/laundry-chain.md, docs/laundry_list.md, docs/done_laundry_list.md. Then run the laundry-list chain exactly as docs/laundry-chain.md describes: its start checks first (one chain session at a time, session number against the limit, queue, title, human answers first), then one bundle from its Queue through the SESSION.md operating loop to a draft pull request titled `Chain N/<limit> — <theme> (<items>)`, opened as soon as the branch has its first commit.
+
+Rules for this run:
+- Merges are autonomous for chain sessions (human decision <yyyy-mm-dd>, recorded in docs/laundry-chain.md). When all of these hold: <checks> pass from a clean environment; the reviewer sub-agent's findings are fixed; `<default branch>` is merged into the branch with no conflict and the checks pass again; the PR body carries the verification evidence; and the diff touches nothing under `.github/workflows/`; then mark the PR ready (`gh api -X POST repos/<owner>/<repo>/pulls/N/ccr/ready_for_review`), squash-merge it (`gh api -X PUT repos/<owner>/<repo>/pulls/N/merge -f merge_method=squash`), delete the branch (`gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<branch>`; if the deletion is refused, say so in one line and move on), and verify that `<default branch>` contains the squash commit. If any condition fails, leave the PR open as a draft and say exactly why in the final report. Never merge a failing or conflicted PR.
+- Never ask a question. A decision that is the human's becomes a `human-action` issue per skills/human-attention/SKILL.md (try the action first and quote the refusal; ask for the missing capability rather than the chore; file with `gh api`, labels `human-action` plus one severity label); the item stays open; finish the rest of the bundle. <off limits>
+- Skip any bundle blocked on an open `human-action` issue. If every remaining bundle is blocked, update docs/laundry-chain.md (Queue, Chain log, Open human actions) and end with the final report instead of a PR.
+- GitHub: use `gh api` (REST) and git. GraphQL is refused, so `gh issue` and `gh pr` subcommands do not work; `gh auth status` reports the token as invalid while `gh api` works, ignore it. Open the PR with `gh api -X POST repos/<owner>/<repo>/pulls -f title=... -f head=... -f base=<default branch> -F draft=true -f body=...`.
+- Verification evidence goes in the PR body (commands and output, surface observation or "no runtime surface"). Update STATE.md, the laundry lists and docs/laundry-chain.md in the same PR; record the merge (or why it was withheld) in the Chain log.
+- End with the final report, as docs/laundry-chain.md says. Do not spawn another session; the schedule starts the next one.
+TEMPLATE_EOF
+
 # ── 5c. docs/attention-check.md — scheduled human-attention check prompt ─────────────────────────────
 write_if_missing "docs/attention-check.md" << 'TEMPLATE_EOF'
 # Attention check
@@ -1192,6 +1213,7 @@ echo "  STATE.md                          ← session memory"
 echo "  docs/laundry_list.md              ← ranked backlog"
 echo "  docs/done_laundry_list.md         ← completed items"
 echo "  docs/laundry-chain.md             ← multi-session chain brief (fill in <placeholders>)"
+echo "  docs/chain-task.md                ← pasteable prompt of the daily chain task (fill in <placeholders>)"
 echo "  docs/attention-check.md           ← human-attention check prompt (fill in <placeholders>, schedule it hourly)"
 echo "  docs/intake.md                    ← intake check prompt (fill in <placeholders>, schedule it every few hours with the Slack connector)"
 echo "  docs/scheduled-tasks.md           ← registry of scheduled tasks (fill in; one per loop)"
