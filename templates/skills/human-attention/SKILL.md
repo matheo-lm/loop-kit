@@ -57,7 +57,7 @@ The final summary of a run that found something starts with `HUMAN ATTENTION:` a
 ## The answer loop
 
 1. The human replies on the issue with an option letter, `done` or a sentence, or simply closes it. A question in the reply gets a short answer on the issue from the next check, grounded in the repository's docs, and the issue stays open.
-2. The next attention check records the answer: a branch `attention/<n>`, the decision written into the laundry item and `STATE.md` with the date, a draft PR, an `attention-recorded` comment, and the issue closed. A closed issue drops out of the queue.
+2. The next attention check records the answer: a branch `attention/<n>`, the decision written into the laundry item and `STATE.md` with the date, a draft PR, an `attention-recorded` comment, and the issue closed. A closed issue drops out of the queue. Where the chain brief records autonomous merges, the check squash-merges that PR itself; otherwise it waits for the human.
 3. The repository's chain scheduled task picks the answer up at its next daily run, scheduled an hour after the digest. Routine sessions cannot fire other tasks; an API trigger on the chain task could make this immediate, at the cost of a token stored in the environment.
 4. The chain session reads human answers first (start check 5 in `docs/laundry-chain.md`) and takes the next bundle.
 
