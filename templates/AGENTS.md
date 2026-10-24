@@ -60,7 +60,7 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/` (agent-agnostic; for Claude Code, copy or symlink into `.claude/agents/`). The agent that writes is never the sole agent that grades.
 4. **Automations** — Scheduled workflows run discovery and triage without human prompting. `.github/workflows/loop-triage.yml` surfaces open laundry-list items as a recurring issue; enable its cron when the list is trustworthy.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
-6. **Human attention** — The human is reached only through `owner-action` issues that meet the five-point bar in `skills/human-attention/SKILL.md`, delivered by the scheduled check in `docs/attention-check.md` with rate limits. Answers come back as recorded decisions. Agents never notify the human directly.
+6. **Human attention** — Every owner-only need is an `owner-action` issue (one queue for the human); the bar in `skills/human-attention/SKILL.md` sets its severity, and the scheduled check in `docs/attention-check.md` is the only thing that reaches the human, with rate limits. Answers come back as recorded decisions. Agents never notify the human directly.
 
 ### The Two Human Gates
 
@@ -80,7 +80,7 @@ Unattended loops make mistakes unattended. These stop the loop for an explicit h
 
 - **Ask with the structured question tool** (Claude Code: AskUserQuestion), not buried in prose. Recommend one option and say why. Batch related questions into one call.
 - **Ask only what is the human's to decide.** Choosing the next item or vertical, how to implement it and what to do after it are the agent's job; do not hand them back as questions.
-- **Owner-only needs become `owner-action` issues**, only when the bar in `skills/human-attention/SKILL.md` is met: owner-only, alternatives exhausted in writing, it matters, not already open, one ask. Everything below that bar is recorded and waits.
+- **Owner-only needs become `owner-action` issues** per `skills/human-attention/SKILL.md`: every one is recorded so the owner has one queue; the bar decides its severity and whether the owner is told. Nothing owner-only lives only in chat.
 - **Unanswered questions are recorded, never guessed.** If nobody answers (a scheduled run, an unattended chain), write the question into the item and the open-questions list, leave that item open, and finish the rest of the work.
 - **Confidence disclosure.** Whenever confidence in a response or solution is below 97%, append "Confidence Level x%" to the response.
 
