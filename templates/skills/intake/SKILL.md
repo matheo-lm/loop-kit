@@ -28,7 +28,7 @@ Kinds, decided per message:
 2. **What exists.** Read that repository's laundry lists (open and done), `STATE.md`, and the code or docs the message touches. State in one or two sentences what is there today.
 3. **What was asked.** Restate the ask in one sentence in the agent's own words.
 4. **The gap.** The difference between 2 and 3, as the item's Problem line. If there is no gap (it already exists or is already an open item), say so in the thread and extend the existing item instead of opening a second.
-5. **Scope and risk.** What the item must not touch (the repository's off-limits list), and whether any part is the human's alone (then that part is a `human-action` issue the chain files later, not intake's job).
+5. **Scope and risk.** What the item must not touch (the repository's off-limits list), and whether any part is the human's alone (then the chain records that part as `WAITING ON HUMAN` or, if critical, files a `human-action` issue; not intake's job).
 
 ## The item bar
 
@@ -47,7 +47,8 @@ A message with ✅ is finished; one with ❓ waits for the human; one with 👀 
 
 ## Boundaries
 
-- Intake never writes code, never changes anything but laundry files, `STATE.md` decision lines and the chain brief's Queue, never touches secrets or workflows, and never files `human-action` issues (the chain does that when it hits the human-only part).
+- Intake never writes code, never changes anything but laundry files, `STATE.md` decision lines and the chain brief's Queue, never touches secrets or workflows, and never files `human-action` issues (the chain records `WAITING ON HUMAN` or, if critical, files the issue when it hits the human-only part).
+- A message that answers a `WAITING ON HUMAN` question (the human names the repository and item, or the thread makes it clear) is written into that item's Status line with the date and the marker removed; nothing new is filed, and the thread gets the check-mark.
 - One PR per repository per run, holding every item filed that run for that repository (deploy budgets: each push builds on some hosts).
 - "Do X now" is not intake: it is filed as an item like anything else, with a thread reply saying the chain will pick it up, or that a session is the right tool.
 - Intake never notifies the human outside the thread; the scheduled task's completion notification carries the run summary.

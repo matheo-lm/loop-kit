@@ -1,11 +1,11 @@
 ---
 name: Human action
-about: A request for something only the human can give. File only when the bar in skills/human-attention/SKILL.md is met.
+about: A critical request for something only the human can give (money, security, legal, public exposure, data loss, every P0 blocked). File only when the bar in skills/human-attention/SKILL.md is met; anything else is asked live or recorded in the item as WAITING ON HUMAN.
 title: "[HUMAN] "
 labels: human-action
 ---
 
-<!-- Add exactly one severity label: severity:critical, severity:blocking or severity:question. -->
+<!-- Add the label severity:critical. Since 2026-10-24 no other severity is filed; a non-critical need is asked live or recorded in the item. -->
 
 ## Decision or action needed
 
@@ -31,7 +31,7 @@ The Stay-the-Engineer rule, or the thing only the human has (credential, account
 
 ## Impact of waiting
 
-Items and verticals blocked: …
+What is critical (money, security, legal, public exposure, data loss, every P0 blocked): …
 Starts to cost on: yyyy-mm-dd (why)
 
 ## How to answer

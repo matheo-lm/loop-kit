@@ -1,56 +1,64 @@
 ---
 name: human-attention
-description: Use the moment an item cannot move without the owner (a human-only decision, credential, account, payment, legal or identity matter) and every agentic alternative is exhausted. Defines the bar, the severity, the issue format, the rate limits and the answer loop. Human attention is the scarcest resource in the loop; spend it only when nothing else can move the work.
+description: Use the moment an item cannot move without the owner (a human-only decision, credential, account, payment, legal or identity matter) and every agentic alternative is exhausted. Defines where the ask goes (live in the chat when the owner is present, recorded in the item when nobody can answer), the one case that becomes an issue (critical), the issue format, the rate limits and the answer loop. Human attention is the scarcest resource in the loop; spend it only when nothing else can move the work.
 ---
 
 # human-attention
 
-The human is not the loop's per-cycle prompter and not its fallback. Every human-only need is recorded as a GitHub issue labeled `human-action` in the repository it concerns, so the human has one queue: the GitHub issue search `is:open label:human-action user:<owner>`. Severity decides whether and when the human is told, and the attention check (`docs/attention-check.md`) is the only thing that tells them. Nothing human-only lives only in chat.
+The human is not the loop's per-cycle prompter and not its fallback. They engineer the loop and answer real questions; they do not want a queue of chores. Three rules decide where a human-only need goes (owner decision 2026-10-24, replacing "every human-only need is an issue"):
 
-## Filing and the bar
+1. **Attended session: ask live.** When the owner is in the chat, ask with the structured question tool (AskUserQuestion): options first, one recommended with its reason, and the paste-ready text or the exact steps when the ask is an action. Record the answer the same session: in the laundry item, in `STATE.md`, and in `MEMORY.md` when it outlives the item. No issue is filed.
+2. **Unattended session: record and continue.** When nobody can answer (a scheduled run, a chain), take the reversible default when one exists and record it. Otherwise write the question into the item's Status line as `WAITING ON HUMAN — <yyyy-mm-dd>: <the one question, the options, the recommended one>`, add one line under "blockers" in `STATE.md`, leave that item open and finish the rest of the work. The daily changelog lists every `WAITING ON HUMAN` line under "Needs you"; the owner answers in the next attended session or in the intake channel, and the answer is written into the item with the marker removed. No issue is filed.
+3. **Critical: an issue.** Only a need that is human-only, has every alternative exhausted in writing, is critical and is not already open becomes a GitHub issue labelled `human-action` and `severity:critical`, filed in the repository it concerns (cross-repository ones in the control repository). The attention check tells the owner at its next run. One queue: `is:open label:human-action user:<owner>`.
 
-File an issue when conditions 1, 4 and 5 below hold and the issue says what the agent did instead: the reversible default it took, or the item it deferred. File it as `severity:blocking` or `severity:critical` only when conditions 2 and 3 also hold; otherwise it is `severity:question`.
+Never: an issue for a chore the owner could do in two minutes while they are in the chat; an issue for a question that is not critical; a direct notification to the owner from a filer. Only the attention check reaches the owner, and only for issues.
 
-1. **Human-only.** The need is on the Stay-the-Engineer list in `AGENTS.md`, or requires something only the human has: credentials, accounts, money, a legal or contractual reading, the human's identity (voice, name, face), or a decision the docs record as the human's.
-2. **Alternatives exhausted, in writing.** Each of these was tried or ruled out, and the issue says what happened: (a) the action itself, attempted, with the refusal quoted (the API message, the classifier reason or the UI-only setting; an issue is never filed on the assumption that something is refused); (b) another approach inside the item; (c) a reversible safe default, taken and recorded instead of asked; (d) deferring the item and doing other backlog work; (e) a recorded decision in the docs, laundry lists, done lists or chain log that already answers it.
-3. **It matters.** It blocks a P0 or P1 item or a whole vertical, or carries risk: money, security, legal, public exposure, data loss.
+## Try first, then ask for the capability
+
+Before any ask, live or recorded, the agent tries the action itself and keeps the refusal (the API message, the classifier reason or the UI-only setting); an ask is never made on the assumption that something is refused. When the blocker is a permission, scope, setting, credential or attachment the agent lacks, option A asks the owner to grant it once (a permission rule, a token scope, a connector, a repository setting) so future runs act without them; the one-off action by the owner is option B. When the capability cannot be granted (a platform limit the owner does not control), the ask says so in one line, the limit is recorded once in the control repository's registry (`docs/scheduled-tasks.md`, "Capabilities"), and later asks point at that record instead of re-explaining it. The owner is asked to do a chore only when no grant exists.
+
+## The bar for an issue
+
+File an issue only when all five hold, and the issue says what the agent did instead (the reversible default it took, or the item it deferred):
+
+1. **Human-only.** The need is on the Stay-the-Engineer list in `AGENTS.md`, or requires something only the owner has: credentials, accounts, money, a legal or contractual reading, the owner's identity (voice, name, face), or a decision the docs record as theirs.
+2. **Alternatives exhausted, in writing.** Each of these was tried or ruled out, and the issue says what happened: (a) the action itself, attempted, with the refusal quoted; (b) another approach inside the item; (c) a reversible safe default, taken and recorded instead of asked; (d) deferring the item and doing other backlog work; (e) a recorded decision in the docs, laundry lists, done lists or chain log that already answers it.
+3. **Critical.** Money, security, legal, public exposure, data loss, or every P0 item of the repository blocked. A P1 item or a vertical that cannot move is not critical: it is a `WAITING ON HUMAN` line.
 4. **Not already open.** No open `human-action` issue covers it. Search first; add to the existing issue instead of opening a second.
 5. **One ask.** The issue asks for exactly one decision or one action, with options and a recommendation. Bundled asks are split or dropped.
 
-If condition 1, 4 or 5 fails: record the question in the item and `STATE.md`, leave the item open, finish the rest of the work. No issue, no notification.
-
-**Ask for the capability, not the chore.** When the blocker is a permission, scope, setting, credential or attachment the agent lacks, option A asks the human to grant it once (a permission rule, a token scope, a connector, a repository setting) so future runs act without them; the one-off action by the human is option B. When the capability cannot be granted (a platform limit the human does not control), the issue says so in one line, the limit is recorded once in the control repository's registry (`docs/scheduled-tasks.md`, "Environment facts"), and later issues point at that record instead of re-explaining it. The human is asked to do a chore only when no grant exists.
+If any condition fails: ask live when the owner is in the chat, otherwise record `WAITING ON HUMAN` in the item and `STATE.md`, leave the item open, finish the rest of the work. No issue, no notification.
 
 ## Severity
 
-| Label | Meaning | Reaches the human |
+| Label | Meaning | Reaches the owner |
 |---|---|---|
-| `severity:critical` | Money, security, legal, public exposure, data loss, or every P0 item blocked | The next hourly attention check |
-| `severity:blocking` | A P0 or P1 item or a vertical cannot move | The next daily digest |
-| `severity:question` | A decision or action that improves the work; nothing is blocked | Never pushed on its own; rolled up in Monday's digest |
+| `severity:critical` | Money, security, legal, public exposure, data loss, or every P0 item blocked | The next attention check (every four hours) |
+| `severity:blocking` | Retired 2026-10-24; not filed any more | Issues that still carry it: the 08:34 UTC digest, until the queue empties |
+| `severity:question` | Retired 2026-10-24; not filed any more | Issues that still carry it: Monday's roll-up, until the queue empties |
 
-Rate limits, enforced by the attention check and not by the filer: at most one critical push per repository per 24 hours (the rest queue into the digest), one digest per day, nothing sent when nothing is new. A blocking issue digested earlier and still open is listed again in each daily digest under "still waiting", so a blocking ask is never silently forgotten; the human relabels it `severity:question` to stop that.
+Rate limits, enforced by the attention check and not by the filer: at most one critical push per repository per 24 hours (the rest queue into the digest), one digest per day, nothing sent when nothing is new. Open issues from before 2026-10-24 that carry a retired label are answered in chat or on the issue and closed; nobody relabels them.
 
 ## Filing
 
-Labels: `human-action` plus exactly one severity label; create them if missing. Title: `[HUMAN] <one-line ask>`. Body in this order (`.github/ISSUE_TEMPLATE/human-action.md` carries it):
+Labels: `human-action` plus `severity:critical`; create them if missing. Title: `[HUMAN] <one-line ask>`. Body in this order (`.github/ISSUE_TEMPLATE/human-action.md` carries it):
 
 1. **Decision or action needed**: one sentence, then options A, B, C with the recommended one first and why.
-2. **Why only you**: the rule, or the thing only the human has.
+2. **Why only you**: the rule, or the thing only the owner has.
 3. **What was tried**: the five alternatives from the bar, each with what happened, the attempted action and its refusal first.
-4. **Impact of waiting**: the items and verticals blocked, and the date it starts to cost (a deadline, an expiring key, a policy date).
-5. **How to answer**: reply on the issue with the option letter or `done`. The next attention check records it and closes the issue. Nothing else is needed from the human.
+4. **Impact of waiting**: what is critical about it, and the date it starts to cost (a deadline, an expiring key, a policy date).
+5. **How to answer**: reply on the issue with the option letter or `done`. The next attention check records it and closes the issue. Nothing else is needed from the owner.
 6. **Links**: the laundry item, the PR or run, the evidence.
 
-In the same change, set the laundry item's status to `HUMAN ACTION OPEN` with the issue link. Never file in a public repository: use the first (private) repository the attention check lists and link the public one. Filers never notify the human directly, in any channel.
+In the same change, set the laundry item's status to `HUMAN ACTION OPEN` with the issue link. Never file in a public repository: use the first (private) repository the attention check lists and link the public one. Filers never notify the owner directly, in any channel.
 
-## The attention check (scheduled, fresh session, hourly)
+## The attention check (scheduled, fresh session, every four hours)
 
-The prompt is `docs/attention-check.md`; the human creates the scheduled task from it once, in the claude.ai Routines UI, with the repositories attached (a routine created from a session carries none, and unattended sessions cannot attach any). Every run lists the open `human-action` issues of the attached repositories over the GitHub REST API, and then:
+The prompt is `docs/attention-check.md`; the owner creates the scheduled task from it once, in the claude.ai Routines UI, with the repositories attached (a routine created from a session carries none, and unattended sessions cannot attach any). Every run lists the open `human-action` issues of the attached repositories over the GitHub REST API, and then:
 
 - For each `severity:critical` issue without an `attention-notified` comment in the last 24 hours: include it in the run's final summary (repository, title, link, the one ask) and comment `attention-notified <yyyy-mm-dd hh:mm UTC>` on it.
-- At the digest hour the prompt names, also include every `severity:blocking` issue without an `attention-digested` comment and comment `attention-digested <timestamp>` on each; list the other open blocking issues under "still waiting"; list open agent pull requests (`Chain ` and `chore: record human answer`) under "PRs waiting for your review"; and on Mondays append a roll-up of open `severity:question` issues (title and link), without commenting on those.
-- For each `human-action` issue with a human comment newer than its last `attention-recorded` comment, or closed by the human without one: on a branch, record the answer in the laundry item and `STATE.md`, open a draft PR, comment `attention-recorded <timestamp>`, and close the issue if it is still open and the answer chose an option or said `done`.
+- At the digest hour the prompt names, also include every `severity:blocking` issue without an `attention-digested` comment and comment `attention-digested <timestamp>` on each; list the other open blocking issues under "still waiting"; list open agent pull requests (`Chain ` and `chore: record human answer`) under "PRs waiting for your review"; and on Mondays append a roll-up of open `severity:question` issues (title and link), without commenting on those. These digest steps serve the issues filed before 2026-10-24 and go quiet as the queue empties.
+- For each `human-action` issue with a human comment newer than its last `attention-recorded` comment, or closed by the human without one: on a branch, record the answer in the laundry item and `STATE.md`, open a draft PR, comment `attention-recorded <timestamp>`, and close the issue if it is still open and the answer chose an option or said `done`. An attended session that records an answer itself leaves the same `attention-recorded` comment so the check does not record it twice.
 - For each recorded answer, name the chain scheduled task that picks it up at its next daily run. Routine sessions cannot fire other tasks (verified 2026-10-24), so the chain's schedule is the kick; schedule it an hour after the digest.
 - If nothing above applied, end with exactly: `Human attention: nothing to escalate.`
 
@@ -58,22 +66,29 @@ The final summary of a run that found something starts with `HUMAN ATTENTION:` a
 
 ## The answer loop
 
-1. The human replies on the issue with an option letter, `done` or a sentence, or simply closes it. A question in the reply gets a short answer on the issue from the next check, grounded in the repository's docs, and the issue stays open.
-2. The next attention check records the answer: a branch `attention/<n>`, the decision written into the laundry item and `STATE.md` with the date, a draft PR, an `attention-recorded` comment, and the issue closed. A closed issue drops out of the queue. Where the chain brief records autonomous merges, the check squash-merges that PR itself; otherwise it waits for the human.
-3. The repository's chain scheduled task picks the answer up at its next daily run, scheduled an hour after the digest. Routine sessions cannot fire other tasks; an API trigger on the chain task could make this immediate, at the cost of a token stored in the environment.
-4. The chain session reads human answers first (start check 5 in `docs/laundry-chain.md`) and takes the next bundle.
+For a live question: the owner answers in the chat; the session writes the answer into the item, `STATE.md` and, when it outlives the item, `MEMORY.md`, in the same PR as the work.
 
-Nothing here needs the human beyond the reply. Each repository that runs a chain has a scheduled task (`<repo>-chain`: daily, a fresh session, the repository attached in the Routines UI, prompt = the chain start line from `docs/laundry-chain.md`), and the attention check's prompt names those tasks and their run times.
+For a `WAITING ON HUMAN` line: the owner answers in the next attended session, or in the intake channel naming the repository and item; the session or the intake check writes the answer into the item's Status line with the date and removes the marker; the repository's next chain run picks it up (start check 5 in `docs/laundry-chain.md`).
+
+For an issue:
+
+1. The owner replies on the issue with an option letter, `done` or a sentence, or simply closes it. A question in the reply gets a short answer on the issue from the next check, grounded in the repository's docs, and the issue stays open.
+2. The next attention check records the answer: a branch `attention/<n>`, the decision written into the laundry item and `STATE.md` with the date, a draft PR, an `attention-recorded` comment, and the issue closed. A closed issue drops out of the queue. Where the chain brief records autonomous merges, the check squash-merges that PR itself; otherwise it waits for the owner.
+3. The repository's chain scheduled task picks the answer up at its next daily run, scheduled an hour after the digest.
+4. The chain session reads human answers first and takes the next bundle.
+
+Each repository that runs a chain has a scheduled task (`<repo>-chain`: daily, a fresh session, the repository attached in the Routines UI, prompt = the chain start line from `docs/laundry-chain.md`), and the attention check's prompt names those tasks and their run times.
 
 ## Red flags
 
 | Thought | Reality |
 |---|---|
-| "I'll ask to be safe" | Safe is a reversible default, recorded. File it as a question so the human can see it; never as blocking. |
-| "Two small questions in one issue" | Split or drop. One ask per issue. |
-| "It's probably critical" | Critical is money, security, legal, public, data loss, or all P0 blocked. Everything else is blocking or question. |
-| "The human will see it in chat" | Chat is not a record. The issue is. |
-| "I'll notify the human now" | Only the attention check reaches the human. Filers file. |
+| "I'll file an issue to be safe" | An issue is for critical only. The owner in the chat: ask now. Nobody answering: `WAITING ON HUMAN` in the item, continue. |
+| "The owner is right here, but the rule says file" | The rule says ask. Options, a recommendation, the paste-ready text; then write the answer down. |
+| "Chat is not a record" | The chat is not; the answer written into the item, `STATE.md` or `MEMORY.md` the same session is. |
+| "Two small questions in one ask" | One ask per question or issue. Batch live questions into one structured call. |
+| "It's probably critical" | Critical is money, security, legal, public, data loss, or every P0 blocked. Everything else waits in the item. |
+| "I'll notify the owner now" | Only the attention check reaches the owner, and only for issues. Filers file; recorders record. |
 | "They haven't answered, I'll guess" | Record the question, leave the item open, do other work. |
 | "I'll ask them to do it" | First try it and quote the refusal. Then ask them to make you able to do it; the chore is option B. |
 | "It was refused before, so it is human-only" | A refusal is a dated fact in the registry; try again when the environment changed. |
