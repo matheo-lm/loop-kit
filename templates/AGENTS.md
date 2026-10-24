@@ -63,6 +63,8 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 6. **Human attention** — Every human-only need is a `human-action` issue (one queue for the human); the bar in `skills/human-attention/SKILL.md` sets its severity, and the scheduled check in `docs/attention-check.md` is the only thing that reaches the human, with rate limits. Answers come back as recorded decisions. Agents never notify the human directly.
 7. **Intake** — The human's raw thoughts, bugs, ideas and feedback land in one private Slack channel; the scheduled intake check in `docs/intake.md` turns each message into a laundry-list item after a gap analysis (`skills/intake/SKILL.md`), asks in the thread when the ask is unclear, and never does the work itself. The loop's inbound half; human attention is the outbound half.
 
+Pieces 6 and 7 are cross-repository: when several repositories share one human, they run once from a private control repository that also keeps `docs/scheduled-tasks.md`, the registry of scheduled tasks.
+
 ### The Two Human Gates
 
 The human engineers the loop, not its per-cycle prompter. Exactly two gates: **Frame** (clarifying questions before code, when ambiguous or on the STOP list) and **Ship** (the PR, with verification evidence). Between them, run to completion — `SESSION.md` defines both gates.
