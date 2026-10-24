@@ -47,7 +47,7 @@ In the same change, set the laundry item's status to `HUMAN ACTION OPEN` with th
 The prompt is `docs/attention-check.md`; the human creates the scheduled task from it once, in the claude.ai Routines UI, with the repositories attached (a routine created from a session carries none, and unattended sessions cannot attach any). Every run lists the open `human-action` issues of the attached repositories over the GitHub REST API, and then:
 
 - For each `severity:critical` issue without an `attention-notified` comment in the last 24 hours: include it in the run's final summary (repository, title, link, the one ask) and comment `attention-notified <yyyy-mm-dd hh:mm UTC>` on it.
-- At the digest hour the prompt names, also include every `severity:blocking` issue without an `attention-digested` comment and comment `attention-digested <timestamp>` on each; list the other open blocking issues under "still waiting"; and on Mondays append a roll-up of open `severity:question` issues (title and link), without commenting on those.
+- At the digest hour the prompt names, also include every `severity:blocking` issue without an `attention-digested` comment and comment `attention-digested <timestamp>` on each; list the other open blocking issues under "still waiting"; list open agent pull requests (`Chain ` and `chore: record human answer`) under "PRs waiting for your review"; and on Mondays append a roll-up of open `severity:question` issues (title and link), without commenting on those.
 - For each `human-action` issue with a human comment newer than its last `attention-recorded` comment, or closed by the human without one: on a branch, record the answer in the laundry item and `STATE.md`, open a draft PR, comment `attention-recorded <timestamp>`, and close the issue if it is still open and the answer chose an option or said `done`.
 - For each recorded answer, name the chain scheduled task that picks it up at its next daily run. Routine sessions cannot fire other tasks (verified 2026-10-24), so the chain's schedule is the kick; schedule it an hour after the digest.
 - If nothing above applied, end with exactly: `Human attention: nothing to escalate.`
@@ -56,7 +56,7 @@ The final summary of a run that found something starts with `HUMAN ATTENTION:` a
 
 ## The answer loop
 
-1. The human replies on the issue with an option letter, `done` or a sentence, or simply closes it.
+1. The human replies on the issue with an option letter, `done` or a sentence, or simply closes it. A question in the reply gets a short answer on the issue from the next check, grounded in the repository's docs, and the issue stays open.
 2. The next attention check records the answer: a branch `attention/<n>`, the decision written into the laundry item and `STATE.md` with the date, a draft PR, an `attention-recorded` comment, and the issue closed. A closed issue drops out of the queue.
 3. The repository's chain scheduled task picks the answer up at its next daily run, scheduled an hour after the digest. Routine sessions cannot fire other tasks; an API trigger on the chain task could make this immediate, at the cost of a token stored in the environment.
 4. The chain session reads human answers first (start check 5 in `docs/laundry-chain.md`) and takes the next bundle.
