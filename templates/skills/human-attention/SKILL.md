@@ -42,7 +42,7 @@ In the same change, set the laundry item's status to `OWNER ACTION OPEN` with th
 
 ## The attention check (scheduled, fresh session, hourly)
 
-The prompt is `docs/attention-check.md`; the owner creates the scheduled task from it once. Every run attaches the repositories the prompt lists, lists their open `owner-action` issues, and then:
+The prompt is `docs/attention-check.md`; the owner creates the scheduled task from it once, in the claude.ai Routines UI, with the repositories attached (a routine created from a session carries none, and unattended sessions cannot attach any). Every run lists the open `owner-action` issues of the attached repositories over the GitHub REST API, and then:
 
 - For each `severity:critical` issue without an `attention-notified` comment in the last 24 hours: include it in the run's final summary (repository, title, link, the one ask) and comment `attention-notified <yyyy-mm-dd hh:mm UTC>` on it.
 - At the digest hour the prompt names, also include every `severity:blocking` issue without an `attention-digested` comment, and comment `attention-digested <timestamp>` on each.
