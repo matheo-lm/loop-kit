@@ -8,7 +8,7 @@ Start a new agent session on this repository with this one-line prompt:
 
 > Continue the laundry-list chain: read docs/laundry-chain.md and run the next session.
 
-The session runs the start checks below, takes the first bundle under "Queue" and follows everything else here. To keep the chain going without starting each session yourself, schedule a daily run (for Claude Code, a scheduled task that starts a fresh session with the same prompt). The start checks keep a scheduled run and a spawned session from working at the same time.
+The session runs the start checks below, takes the first bundle under "Queue" and follows everything else here. To keep the chain going without starting each session yourself, schedule a daily run (for Claude Code, a scheduled task `<repo>-chain` that starts a fresh session with the same prompt, with the repository attached in the Routines UI). The human-attention check (`docs/attention-check.md`) fires that task early when a recorded human answer unblocks an item. The start checks keep a scheduled run and a spawned session from working at the same time.
 
 ## Start checks (every session, before any work)
 
@@ -16,7 +16,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 2. **Session number.** N is the highest session number in "Chain log" plus 1. If N is above <limit> (the human raises this number to continue), stop and post the final report (see Hand-off).
 3. **Queue.** If "Queue" holds no agent-doable bundle, stop and post the final report.
 4. **Title.** Name the branch's PR `Chain N/<limit> — <theme> (<items>)`. The PR title is the lock that check 1 reads, so open the draft PR as soon as the branch has its first commit.
-5. **Human answers first.** Open `human-action` issues with an human reply newer than their last `attention-recorded` comment: record the answer per `skills/human-attention/SKILL.md` before taking a bundle. Skip any bundle blocked on an open `human-action` issue.
+5. **Human answers first.** Open `human-action` issues with a human reply newer than their last `attention-recorded` comment: record the answer per `skills/human-attention/SKILL.md` before taking a bundle. Skip any bundle blocked on an open `human-action` issue.
 
 ## Working agreement (<human>, <yyyy-mm-dd>)
 
