@@ -11,6 +11,8 @@ labels: human-action
 
 One sentence. Then options, recommended first:
 
+<!-- If the blocker is a capability the human can grant (a permission rule, a token scope, a connector, a repository setting), option A asks for the grant so future runs act alone; the one-off action is option B. -->
+
 - **A (recommended):** … because …
 - **B:** …
 - **C:** …
@@ -21,6 +23,7 @@ The Stay-the-Engineer rule, or the thing only the human has (credential, account
 
 ## What was tried
 
+- The action itself: attempted yyyy-mm-dd; refused with: … (the API message, the classifier reason or the UI-only setting)
 - Another approach inside the item: …
 - A reversible safe default: … (taken and recorded, or why none exists)
 - Deferring the item and doing other work: …
