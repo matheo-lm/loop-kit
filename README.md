@@ -37,6 +37,37 @@ Loop-kit gives you the pieces, ready to drop in:
 
 When one person runs the loop across several repositories, the two cross-repository pieces live once: the human-attention check and the intake check run from a private **control repository**, which also keeps `docs/scheduled-tasks.md`, the registry of every scheduled task (id, schedule, repositories and connectors attached, prompt source, environment facts learned from runs). Project repositories keep their own chain brief, `chain-task.md` and `human-attention` skill, because filing is local and chains are per repository. Cross-repository human-only needs are filed in the control repository.
 
+### The loop in one picture
+
+```mermaid
+flowchart LR
+  H(("Human"))
+  CH["one private Slack channel"]
+  subgraph CT["control repository (private)"]
+    IN["intake check<br/>every few hours"]
+    AT["human-attention check<br/>every few hours, one daily digest"]
+    REG["docs/scheduled-tasks.md<br/>registry"]
+  end
+  subgraph REPOS["project repositories"]
+    LL["laundry lists"]
+    CHN["daily chain tasks"]
+    PR["pull requests<br/>merged under the working agreement"]
+    HA["human-action issues"]
+  end
+  H -->|"thoughts, bugs, ideas"| CH
+  CH -->|"gap analysis, asks when unclear"| IN
+  IN -->|"files items"| LL
+  LL --> CHN --> PR -->|"merged"| LL
+  CHN -->|"human-only need, after trying"| HA
+  HA --> AT -->|"critical now, blocking daily, questions weekly"| H
+  H -->|"answers on the issue"| HA
+  AT -->|"records, closes"| LL
+  REG -.- IN
+  REG -.- AT
+```
+
+Inbound (the channel), work (the chains), outbound (the queue). The human writes in one place and answers in one place; everything else is files in repositories.
+
 Plus the **Karpathy operating principles** at the top of `AGENTS.md` (think before coding, simplicity first, surgical changes, goal-driven execution) and the **two human gates** in `SESSION.md` (frame before code, ship at the PR — nothing in between). `AGENTS.md` also carries the **stay-the-engineer** list (production writes asked each time, outward publishing, data deletion, payments, auth), the **question rules** (structured question tool, one recommended option, unanswered questions recorded instead of guessed) and **confidence disclosure** ("Confidence Level x%" whenever confidence is below 97%).
 
 ---
@@ -52,6 +83,7 @@ STATE.md                          ← session memory
 docs/laundry_list.md              ← ranked backlog / quality gap tracker
 docs/done_laundry_list.md         ← completed items archive
 docs/laundry-chain.md             ← multi-session chain brief
+docs/chain-task.md                ← pasteable prompt of the repository's daily chain task (fill in)
 docs/attention-check.md           ← human-attention check prompt (schedule it hourly)
 docs/intake.md                    ← intake check prompt (schedule it every few hours, Slack connector attached)
 docs/scheduled-tasks.md           ← registry of scheduled tasks (fill in; one per loop, in the control repository)
@@ -157,6 +189,16 @@ Continue the laundry-list chain: read docs/laundry-chain.md and run the next ses
 Each session runs one bundle, logs it, queues the next and starts the next session. A daily scheduled run with the same prompt keeps it going; the PR-title lock stops two sessions from overlapping.
 
 ---
+
+## What Claude Code cloud sessions refuse (observed 2026-10-24)
+
+Design the loop around these; none of them is a bug to work around.
+
+- A scheduled task created from a session carries no repositories or connectors; both are attached only in the Routines UI, and unattended sessions are refused `add_repo`. Record what the human attached in `docs/scheduled-tasks.md`.
+- The auto-mode permission classifier may refuse to store a task prompt that merges without review. Keep the prompt in a doc (`docs/chain-task.md`, `docs/attention-check.md`, `docs/intake.md`) and let the human paste it, or have them grant a permission rule for the trigger tools once.
+- GitHub GraphQL is unavailable (`gh issue`, `gh pr`, issue transfers); REST (`gh api`) works, and draft-to-ready goes through `POST repos/O/R/pulls/N/ccr/ready_for_review`. `gh auth status` reports the token as invalid while `gh api` works.
+- Agent tokens cannot write `.github/workflows/` (no `workflow` scope): stage workflow files under `workflows/` and let the human copy them. Repository-settings writes, repository creation and branch deletion through the API are refused by the proxy; turn on "Automatically delete head branches" per repository instead of deleting branches.
+- Routine sessions cannot fire other tasks; the schedule is the kick. A run that hits the account's usage limit fails within seconds and does nothing.
 
 ## Agent workflow
 
