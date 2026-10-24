@@ -50,11 +50,13 @@ emit "docs/laundry_list.md" "4. docs/laundry_list.md — ranked backlog" templat
 emit "docs/done_laundry_list.md" "5. docs/done_laundry_list.md — completed items" templates/docs/done_laundry_list.md
 emit "docs/laundry-chain.md" "5b. docs/laundry-chain.md — multi-session chain brief" templates/docs/laundry-chain.md
 emit "docs/attention-check.md" "5c. docs/attention-check.md — scheduled human-attention check prompt" templates/docs/attention-check.md
+emit "docs/intake.md" "5d. docs/intake.md — scheduled intake check prompt" templates/docs/intake.md
 emit "skills/disciplined-coding/SKILL.md" "6. skill — disciplined coding" templates/skills/disciplined-coding/SKILL.md
 emit "skills/design/SKILL.md" "7. skill — frontend design" templates/skills/design/SKILL.md
 emit "skills/usability-heuristics/SKILL.md" "8. skill — usability heuristics" templates/skills/usability-heuristics/SKILL.md
 emit "skills/surface-verification/SKILL.md" "9. skill — surface verification" templates/skills/surface-verification/SKILL.md
 emit "skills/human-attention/SKILL.md" "9b. skill — human attention" templates/skills/human-attention/SKILL.md
+emit "skills/intake/SKILL.md" "9c. skill — intake" templates/skills/intake/SKILL.md
 emit ".agents/reviewer.md" "10. sub-agent — reviewer" templates/.agents/reviewer.md
 emit ".agents/security-auditor.md" "11. sub-agent — security auditor" templates/.agents/security-auditor.md
 emit ".github/workflows/loop-triage.yml" "12. automation — scheduled triage" templates/.github/workflows/loop-triage.yml
@@ -95,11 +97,13 @@ echo "  docs/laundry_list.md              ← ranked backlog"
 echo "  docs/done_laundry_list.md         ← completed items"
 echo "  docs/laundry-chain.md             ← multi-session chain brief (fill in <placeholders>)"
 echo "  docs/attention-check.md           ← human-attention check prompt (fill in <placeholders>, schedule it hourly)"
+echo "  docs/intake.md                    ← intake check prompt (fill in <placeholders>, schedule it every few hours with the Slack connector)"
 echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"
 echo "  skills/surface-verification/      ← runtime-observation verification skill"
 echo "  skills/human-attention/           ← when and how the human is reached (human-action issues)"
+echo "  skills/intake/                    ← intake skill"
 echo "  .agents/reviewer.md               ← code review sub-agent"
 echo "  .agents/security-auditor.md       ← security audit sub-agent"
 echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"

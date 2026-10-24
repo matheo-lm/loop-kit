@@ -8,7 +8,7 @@ Start a new agent session on this repository with this one-line prompt:
 
 > Continue the laundry-list chain: read docs/laundry-chain.md and run the next session.
 
-The session runs the start checks below, takes the first bundle under "Queue" and follows everything else here. To keep the chain going without starting each session yourself, schedule a daily run (for Claude Code, a scheduled task `<repo>-chain` that starts a fresh session with the same prompt, with the repository attached in the Routines UI). The human-attention check (`docs/attention-check.md`) records human answers; schedule the chain an hour after its digest so the next run picks them up. The start checks keep a scheduled run and a spawned session from working at the same time.
+The session runs the start checks below, takes the first bundle under "Queue" and follows everything else here. To keep the chain going without starting each session yourself, schedule a daily run (for Claude Code, a scheduled task `<repo>-chain` that starts a fresh session with the same prompt, with the repository attached in the Routines UI). The human-attention check (`docs/attention-check.md`) records human answers; schedule the chain an hour after its digest so the next run picks them up. The start checks keep a scheduled run and a spawned session from working at the same time. New items also arrive from the intake check (`docs/intake.md`), which files what the human drops in the intake channel.
 
 ## Start checks (every session, before any work)
 
