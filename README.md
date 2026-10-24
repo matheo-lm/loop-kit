@@ -2,7 +2,7 @@
 
 **Bootstrap loop engineering into any codebase in one command.**
 
-A structured starter kit that adds the five pieces of [loop engineering](https://addyosmani.com/blog/loop-engineering/) to your project — memory, skills, sub-agents, automations, and worktrees — a sixth piece, human attention (the human is reached only through owner-action issues that meet a bar, by a scheduled check), plus the [Karpathy disciplined coding](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md) operating principles.
+A structured starter kit that adds the five pieces of [loop engineering](https://addyosmani.com/blog/loop-engineering/) to your project — memory, skills, sub-agents, automations, and worktrees — a sixth piece, human attention (the human is reached only through human-action issues that meet a bar, by a scheduled check), plus the [Karpathy disciplined coding](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md) operating principles.
 
 ```
 curl -fsSL https://raw.githubusercontent.com/matheo-lm/loop-kit/main/scripts/loop-init.sh | bash
@@ -30,7 +30,7 @@ Loop-kit gives you the pieces, ready to drop in:
 | **Automations** | `.github/workflows/loop-triage.yml` | Scheduled discovery and triage without human prompting. |
 | **Worktrees** | `AGENTS.md` | Documented `git worktree` pattern for parallel agents. |
 | **Chains** | `docs/laundry-chain.md` | Multi-session runs: one bundle per session, PR title as lock, session limit, queue, chain log, hand-off to the next session. |
-| **Human attention** | `skills/human-attention/SKILL.md`, `.github/ISSUE_TEMPLATE/owner-action.md`, `docs/attention-check.md` | The human is reached only through `owner-action` issues that meet a five-point bar, by a scheduled hourly check with rate limits (critical now, blocking in a daily digest, questions never pushed). Answers come back as recorded decisions. |
+| **Human attention** | `skills/human-attention/SKILL.md`, `.github/ISSUE_TEMPLATE/human-action.md`, `docs/attention-check.md` | The human is reached only through `human-action` issues that meet a five-point bar, by a scheduled hourly check with rate limits (critical now, blocking in a daily digest, questions never pushed). Answers come back as recorded decisions. |
 
 Plus the **Karpathy operating principles** at the top of `AGENTS.md` (think before coding, simplicity first, surgical changes, goal-driven execution) and the **two human gates** in `SESSION.md` (frame before code, ship at the PR — nothing in between). `AGENTS.md` also carries the **stay-the-engineer** list (production writes asked each time, outward publishing, data deletion, payments, auth), the **question rules** (structured question tool, one recommended option, unanswered questions recorded instead of guessed) and **confidence disclosure** ("Confidence Level x%" whenever confidence is below 97%).
 
@@ -56,7 +56,7 @@ skills/human-attention/SKILL.md   ← when and how the human is reached
 .agents/reviewer.md               ← code review sub-agent
 .agents/security-auditor.md       ← security audit sub-agent
 .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)
-.github/ISSUE_TEMPLATE/owner-action.md ← owner-action issue template
+.github/ISSUE_TEMPLATE/human-action.md ← human-action issue template
 .claude/skills/*                  ← Claude Code skill symlinks (committed — portable setup)
 ```
 

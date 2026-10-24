@@ -16,7 +16,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 2. **Session number.** N is the highest session number in "Chain log" plus 1. If N is above <limit> (the human raises this number to continue), stop and post the final report (see Hand-off).
 3. **Queue.** If "Queue" holds no agent-doable bundle, stop and post the final report.
 4. **Title.** Name the branch's PR `Chain N/<limit> — <theme> (<items>)`. The PR title is the lock that check 1 reads, so open the draft PR as soon as the branch has its first commit.
-5. **Owner answers first.** Open `owner-action` issues with an owner reply newer than their last `attention-recorded` comment: record the answer per `skills/human-attention/SKILL.md` before taking a bundle. Skip any bundle blocked on an open `owner-action` issue.
+5. **Human answers first.** Open `human-action` issues with an human reply newer than their last `attention-recorded` comment: record the answer per `skills/human-attention/SKILL.md` before taking a bundle. Skip any bundle blocked on an open `human-action` issue.
 
 ## Working agreement (<human>, <yyyy-mm-dd>)
 
@@ -44,7 +44,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 
 - **Pick the next bundle.** ONE bundle of 2–5 related items that agents can finish. Exclude paused, human-action-only, on-hold, design-first items and items owned by another open PR. Prefer coherent themes and higher priority.
 - **If such work remains and N is below <limit>:** start the next session (Claude Code cloud: the `create_session` tool with this repository as source, title `Chain N+1/<limit> — <theme> (<items>)` and the one-line prompt above). If spawning is refused (for example, a nesting limit), the queue is already up to date: end with the one-line prompt for the human, or rely on the scheduled run.
-- **Otherwise:** do not spawn. Post a final report listing what is left and why, each with the one thing the human must do. If an item meets the bar in `skills/human-attention/SKILL.md`, file the `owner-action` issue; the attention check carries it from there.
+- **Otherwise:** do not spawn. Post a final report listing what is left and why, each with the one thing the human must do. If an item meets the bar in `skills/human-attention/SKILL.md`, file the `human-action` issue; the attention check carries it from there.
 - **Last message:** the next session's title and ID, or the final report.
 
 ## Queue
@@ -62,7 +62,7 @@ None.
 
 ## Open human actions
 
-Home: open `owner-action` issues (`skills/human-attention/SKILL.md`). Link them here; never restate them.
+Home: open `human-action` issues (`skills/human-attention/SKILL.md`). Link them here; never restate them.
 
 ## Environment notes
 

@@ -58,7 +58,7 @@ emit "skills/human-attention/SKILL.md" "9b. skill — human attention" templates
 emit ".agents/reviewer.md" "10. sub-agent — reviewer" templates/.agents/reviewer.md
 emit ".agents/security-auditor.md" "11. sub-agent — security auditor" templates/.agents/security-auditor.md
 emit ".github/workflows/loop-triage.yml" "12. automation — scheduled triage" templates/.github/workflows/loop-triage.yml
-emit ".github/ISSUE_TEMPLATE/owner-action.md" "12b. human attention — owner-action issue template" templates/.github/ISSUE_TEMPLATE/owner-action.md
+emit ".github/ISSUE_TEMPLATE/human-action.md" "12b. human attention — human-action issue template" templates/.github/ISSUE_TEMPLATE/human-action.md
 
 cat << 'FTR'
 
@@ -99,11 +99,11 @@ echo "  skills/disciplined-coding/        ← disciplined coding skill"
 echo "  skills/design/                    ← frontend design skill"
 echo "  skills/usability-heuristics/      ← usability evaluation skill"
 echo "  skills/surface-verification/      ← runtime-observation verification skill"
-echo "  skills/human-attention/           ← when and how the human is reached (owner-action issues)"
+echo "  skills/human-attention/           ← when and how the human is reached (human-action issues)"
 echo "  .agents/reviewer.md               ← code review sub-agent"
 echo "  .agents/security-auditor.md       ← security audit sub-agent"
 echo "  .github/workflows/loop-triage.yml ← scheduled triage (manual-only until you enable the cron)"
-echo "  .github/ISSUE_TEMPLATE/owner-action.md ← owner-action issue template"
+echo "  .github/ISSUE_TEMPLATE/human-action.md ← human-action issue template"
 echo "  .claude/skills/*                  ← Claude Code skill symlinks (commit these)"
 echo ""
 echo "Next steps:"

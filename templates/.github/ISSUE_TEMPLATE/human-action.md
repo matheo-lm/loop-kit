@@ -1,8 +1,8 @@
 ---
-name: Owner action
-about: A request for something only the owner can give. File only when the bar in skills/human-attention/SKILL.md is met.
-title: "[OWNER] "
-labels: owner-action
+name: Human action
+about: A request for something only the human can give. File only when the bar in skills/human-attention/SKILL.md is met.
+title: "[HUMAN] "
+labels: human-action
 ---
 
 <!-- Add exactly one severity label: severity:critical, severity:blocking or severity:question. -->
@@ -17,7 +17,7 @@ One sentence. Then options, recommended first:
 
 ## Why only you
 
-The Stay-the-Engineer rule, or the thing only the owner has (credential, account, money, legal reading, identity, a decision the docs record as yours).
+The Stay-the-Engineer rule, or the thing only the human has (credential, account, money, legal reading, identity, a decision the docs record as yours).
 
 ## What was tried
 
