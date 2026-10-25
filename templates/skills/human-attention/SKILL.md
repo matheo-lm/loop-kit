@@ -7,7 +7,7 @@ description: Use the moment an item cannot move without the owner (a human-only 
 
 The human is not the loop's per-cycle prompter and not its fallback. They engineer the loop and answer real questions; they do not want a queue of chores. Three rules decide where a human-only need goes (owner decision 2026-10-24, replacing "every human-only need is an issue"):
 
-1. **Attended session: ask live.** When the owner is in the chat, ask with the structured question tool (AskUserQuestion): options first, one recommended with its reason, and the paste-ready text or the exact steps when the ask is an action. Record the answer the same session: in the laundry item, in `STATE.md`, and in `MEMORY.md` when it outlives the item. No issue is filed.
+1. **Attended session: ask live.** When the owner is in the chat, ask with the structured question tool (AskUserQuestion): options first, one recommended with its reason, and the paste-ready text or the exact steps when the ask is an action. Record the answer the same session: as a comment on the laundry issue, and in `STATE.md` and `MEMORY.md` when it outlives the item. No `human-action` issue is filed.
 2. **Unattended session: record and continue.** When nobody can answer (a scheduled run, a chain), take the reversible default when one exists and record it. Otherwise label the issue `waiting-on-human` and add one comment with the one question, the options and the recommended one, add one line under "blockers" in `STATE.md` when the whole goal is stuck, leave that issue open and finish the rest of the work. The daily changelog and the attention check's digest list every open `waiting-on-human` issue under "Needs you" and "Waiting on you"; the owner answers in a comment, in the next attended session or in the intake channel, and the answer is recorded as a comment with the label removed. No `human-action` issue is filed.
 3. **Critical: an issue.** Only a need that is human-only, has every alternative exhausted in writing, is critical and is not already open becomes a GitHub issue labelled `human-action` and `severity:critical`, filed in the repository it concerns (cross-repository ones in the control repository). The attention check tells the owner at its next run. One queue: `is:open label:human-action user:<owner>`.
 
@@ -48,9 +48,9 @@ Labels: `human-action` plus `severity:critical`; create them if missing. Title: 
 3. **What was tried**: the five alternatives from the bar, each with what happened, the attempted action and its refusal first.
 4. **Impact of waiting**: what is critical about it, and the date it starts to cost (a deadline, an expiring key, a policy date).
 5. **How to answer**: reply on the issue with the option letter or `done`. The next attention check records it and closes the issue. Nothing else is needed from the owner.
-6. **Links**: the laundry item, the PR or run, the evidence.
+6. **Links**: the laundry issue, the PR or run, the evidence.
 
-In the same change, set the laundry item's status to `HUMAN ACTION OPEN` with the issue link. Never file in a public repository: use the first (private) repository the attention check lists and link the public one. Filers never notify the owner directly, in any channel.
+In the same change, comment the `human-action` issue's link on the laundry issue and label it `waiting-on-human`. Never file in a public repository: use the first (private) repository the attention check lists and link the public one. Filers never notify the owner directly, in any channel.
 
 ## The attention check (scheduled, fresh session, every four hours)
 
@@ -73,7 +73,7 @@ For a `waiting-on-human` issue: the owner answers in a comment on the issue, in 
 For an issue:
 
 1. The owner replies on the issue with an option letter, `done` or a sentence, or simply closes it. A question in the reply gets a short answer on the issue from the next check, grounded in the repository's docs, and the issue stays open.
-2. The next attention check records the answer: a branch `attention/<n>`, the decision written into the laundry item and `STATE.md` with the date, a draft PR, an `attention-recorded` comment, and the issue closed. A closed issue drops out of the queue. Where the chain brief records autonomous merges, the check squash-merges that PR itself; otherwise it waits for the owner.
+2. The next attention check records the answer: an `attention-recorded` comment with the answer on the issue (and on the laundry issue it links), the issue closed, and, only for a standing decision, a branch `attention/<n>` with one `STATE.md` line, a draft PR squash-merged under the chain brief's working agreement. A closed issue drops out of the queue.
 3. The repository's chain scheduled task picks the answer up at its next daily run, scheduled an hour after the digest.
 4. The chain session reads human answers first and takes the next bundle.
 
