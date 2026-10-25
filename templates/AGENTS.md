@@ -55,10 +55,10 @@ STATE.md → read memory → plan → implement → verify → update STATE.md �
 
 ### The Seven Pieces
 
-1. **Memory** — `STATE.md` tracks the current goal and blockers; `docs/laundry_list.md` is the ranked backlog and `docs/done_laundry_list.md` the archive. The agent reads them at session start and writes at session end. The model forgets; the repo doesn't.
+1. **Memory** — `STATE.md` tracks the current goal and blockers; the open GitHub issues labelled `laundry` are the ranked backlog (priority `P0` to `P3`, area labels) and the closed ones the archive (`docs/laundry_list.md` says how). The agent reads them at session start and writes at session end. The model forgets; the repository and its issues don't.
 2. **Skills** — `skills/<name>/SKILL.md` files codify project knowledge so every agent doesn't re-derive it from zero. Conventions, build steps, rationale — written once, read every run. Each skill carries YAML frontmatter (`name`, `description`) so agent tools can discover it; for Claude Code, symlink skills into `.claude/skills/` (`ln -s ../../skills/<name> .claude/skills/<name>`).
 3. **Sub-agents** — Maker and checker are separated. Defined in `.agents/` (agent-agnostic; for Claude Code, copy or symlink into `.claude/agents/`). The agent that writes is never the sole agent that grades.
-4. **Automations** — Scheduled workflows run discovery and triage without human prompting. `.github/workflows/loop-triage.yml` surfaces open laundry-list items as a recurring issue; enable its cron when the list is trustworthy.
+4. **Automations** — Scheduled workflows run discovery and triage without human prompting. `.github/workflows/loop-triage.yml` posts the open `laundry` issues as a recurring digest; enable its cron when the backlog is trustworthy.
 5. **Worktrees** — For parallel work, use `git worktree` isolation so concurrent agents don't collide.
 6. **Human attention** — A human-only need is asked live when the human is in the chat and recorded in the item (`WAITING ON HUMAN`) when nobody can answer; only a critical need becomes a `human-action` issue, per `skills/human-attention/SKILL.md`. The scheduled attention check, run from the control repository, is the only thing that reaches the human for issues; the daily changelog lists what waits. Answers come back as recorded decisions. Agents never notify the human directly.
 7. **Intake** — The human's raw thoughts, bugs, ideas and feedback land in one private Slack channel; the scheduled intake check in `docs/intake.md` turns each message into a laundry-list item after a gap analysis (`skills/intake/SKILL.md`), asks in the thread when the ask is unclear, and never does the work itself. The loop's inbound half; human attention is the outbound half.
@@ -97,10 +97,10 @@ Follow the phased operating loop in `SESSION.md` — it is the canonical session
 
 In summary:
 1. **Pre-flight**: Check open PRs (QA; merge only with approval), prune merged worktrees, sync `<default-branch>`.
-2. **Start**: Read `STATE.md`, `docs/laundry_list.md`, `docs/done_laundry_list.md`.
+2. **Start**: Read `STATE.md` and the open `laundry` issues.
 3. **Phase 1-3**: Gather evidence, build vertical candidates, commit to a vertical (Frame gate).
 4. **Phase 4-5**: Implement (fan out agents for independent items), verify, review, evaluate.
-5. **Bookkeeping**: Update `STATE.md`, move completed items from `docs/laundry_list.md` to `docs/done_laundry_list.md`.
+5. **Bookkeeping**: Update `STATE.md`; close finished issues with the evidence (`Closes #N` in the PR body); file follow-up work as new issues.
 6. **Ship**: Feature branch, conventional commit, PR with verification evidence (Ship gate).
 7. **Loop**: If exit criteria not met, return to step 2.
 
@@ -111,7 +111,7 @@ These thoughts mean stop — you're rationalizing:
 | Thought | Reality |
 |---------|---------|
 | "This is too simple to need acceptance criteria" | Simple items with unexamined assumptions are where rework comes from. Two lines is enough. |
-| "I'll just fix this adjacent thing while I'm here" | Scope creep breaks surgical changes. Add it to `docs/laundry_list.md` instead. |
+| "I'll just fix this adjacent thing while I'm here" | Scope creep breaks surgical changes. File it as a `laundry` issue instead. |
 | "Tests probably pass" / "this should work now" | Evidence before claims. Run them. |
 | "Tests pass, so it works" | Tests prove the code satisfies its own assertions, not that the change is wired to reality. Run the artifact and watch the change happen at its surface (`skills/surface-verification/SKILL.md`). |
 | "I'll check with the human if this looks good so far" | Mid-loop permission-seeking re-inserts the human into the cycle. Verify against the criteria and ship. |

@@ -24,7 +24,7 @@ Loop-kit gives you the pieces, ready to drop in:
 
 | Piece | File | What it does |
 |-------|------|-------------|
-| **Memory** | `STATE.md` + `docs/laundry_list.md` | Persistent session state and ranked backlog. Agent reads at start, writes at end. The model forgets; the repo doesn't. |
+| **Memory** | `STATE.md` + GitHub issues labelled `laundry` | Persistent session state and a ranked backlog in issues (`docs/laundry_list.md` says how). Agent reads at start, writes at end. The model forgets; the repository doesn't. |
 | **Skills** | `skills/*/SKILL.md` | Codified project knowledge. Conventions, build steps, rationale — written once, read every run. |
 | **Sub-agents** | `.agents/reviewer.md` | Maker/checker separation. One writes, a second verifies. |
 | **Automations** | `.github/workflows/loop-triage.yml` | Scheduled discovery and triage without human prompting. |
@@ -49,14 +49,14 @@ flowchart LR
     REG["docs/scheduled-tasks.md<br/>registry"]
   end
   subgraph REPOS["project repositories"]
-    LL["laundry lists"]
+    LL["laundry issues"]
     CHN["daily chain tasks"]
     PR["pull requests<br/>merged under the working agreement"]
     HA["human-action issues"]
   end
   H -->|"thoughts, bugs, ideas"| CH
   CH -->|"gap analysis, asks when unclear"| IN
-  IN -->|"files items"| LL
+  IN -->|"files issues"| LL
   LL --> CHN --> PR -->|"merged"| LL
   CHN -->|"critical human-only need, after trying"| HA
   HA --> AT -->|"critical issues only, rate-limited"| H
@@ -80,8 +80,8 @@ After running the bootstrap, your repo gets:
 SESSION.md                        ← session-start prompt (give this to your agent)
 AGENTS.md                         ← operating model + principles
 STATE.md                          ← session memory
-docs/laundry_list.md              ← ranked backlog / quality gap tracker
-docs/done_laundry_list.md         ← completed items archive
+docs/laundry_list.md              ← how the backlog lives in GitHub issues (label laundry, P0 to P3)
+docs/done_laundry_list.md         ← finished work is a closed issue
 docs/laundry-chain.md             ← multi-session chain brief
 docs/chain-task.md                ← pasteable prompt of the repository's daily chain task (fill in)
 docs/attention-check.md           ← human-attention check prompt (schedule it hourly)
@@ -128,7 +128,7 @@ Then edit `AGENTS.md` with your project's:
 After setup, **`SESSION.md` is what you give your agent** at the start of each session. It tells the agent:
 
 ```
-Read AGENTS.md → read STATE.md + docs/laundry_list.md → run 5-phase operating loop → ship PR → loop
+Read AGENTS.md → read STATE.md + the open laundry issues → run 5-phase operating loop → ship PR → loop
 ```
 
 Open your agent's chat/terminal and paste:
@@ -152,10 +152,10 @@ The agent then runs the full ritual: gather evidence, build candidates, commit t
 ```bash
 curl -fsSL https://raw.githubusercontent.com/matheo-lm/loop-kit/main/scripts/loop-init.sh | bash
 # then manually:
-code docs/laundry_list.md  # populate via codebase audit
+# then file the audit's findings as issues labelled laundry
 ```
 
-Run a deep audit of your codebase (grep for common issues, inspect components, check test coverage) and populate `docs/laundry_list.md` with findings. This gives the agent a ranked backlog to work from.
+Run a deep audit of your codebase (grep for common issues, inspect components, check test coverage) and file the findings as GitHub issues labelled `laundry` with a priority label (`docs/laundry_list.md` says how). This gives the agent a ranked backlog to work from.
 
 ### Add project skills
 
@@ -198,14 +198,14 @@ Design the loop around these; none of them is a bug to work around.
 - The auto-mode permission classifier may refuse to store a task prompt that merges without review. Keep the prompt in a doc (`docs/chain-task.md`, `docs/attention-check.md`, `docs/intake.md`) and let the human paste it, or have them grant a permission rule for the trigger tools once.
 - GitHub GraphQL is unavailable (`gh issue`, `gh pr`, issue transfers); REST (`gh api`) works, and draft-to-ready goes through `POST repos/O/R/pulls/N/ccr/ready_for_review`. `gh auth status` reports the token as invalid while `gh api` works.
 - Agent tokens cannot write `.github/workflows/` (no `workflow` scope): stage workflow files under `workflows/` and let the human copy them. Repository-settings writes, repository creation and branch deletion through the API are refused by the proxy; turn on "Automatically delete head branches" per repository instead of deleting branches.
-- Routine-fired sessions have no `create_session` or `list_sessions`, so a scheduled task cannot dispatch other sessions: each task does its own work in place, and a running chain is known by its open draft PR (the lock), not by session tags. Whether a routine session can fire another task is unclear (one reported `fire_trigger` absent, another listed it among its tools); the schedule is the kick. A run that hits the account's usage limit fails within seconds and does nothing.
+- Routine-fired sessions have no `create_session` or `list_sessions`, so a scheduled task cannot dispatch other sessions: each task does its own work in place, and a running chain is known by its open draft PR (the lock), not by session tags. A routine-fired session has none of the claude-code-remote tools (`fire_trigger`, `create_trigger`, `send_later`, `create_session`...; probed 2026-10-25), so routines cannot kick routines: the schedule is the only kick, and a run with nothing to do must exit cheaply. A run that hits the account's usage limit fails within seconds and does nothing.
 
 ## Agent workflow
 
 Every session follows the phased loop in `SESSION.md`:
 
 ```
-SESSION.md → AGENTS.md → STATE.md + laundry_list.md → gather evidence → build candidates →
+SESSION.md → AGENTS.md → STATE.md + laundry issues → gather evidence → build candidates →
 commit to one → implement → verify → review → bookkeep → ship PR → loop
 ```
 
