@@ -1,11 +1,9 @@
 # done laundry list
 
-completed items from `docs/laundry_list.md`. nothing is deleted — only moved here.
+Finished work is a closed `laundry` issue: `https://github.com/<owner>/<repo>/issues?q=is%3Aissue+label%3Alaundry+is%3Aclosed`. The closing comment of each issue names the PR, the date and the verification.
 
-**read this to avoid re-fixing what's already fixed.**
+**Read the closed issues before re-fixing what is already fixed** (`gh api "repos/<owner>/<repo>/issues?labels=laundry&state=closed&per_page=100"`).
+
+If this repository once kept a done list in this file, the text below the rule is a frozen archive.
 
 ---
-
-| date completed | area | original item | notes |
-|----------------|------|---------------|-------|
-| yyyy-mm-dd | ux/ui | item text | implementation notes |

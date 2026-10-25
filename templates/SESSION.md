@@ -8,15 +8,15 @@ When a human says "go" or "loop", run this full protocol from Phase 0 through Sh
 
 Read `AGENTS.md` completely before doing anything else. It is the canonical agent guide and overrides all other instructions.
 
-Then read `STATE.md` and `docs/laundry_list.md` to understand current state and priorities. If this session is part of the laundry-list chain, read `docs/laundry-chain.md` and run its start checks first.
+Then read `STATE.md` and the open `laundry` issues (`gh api "repos/<owner>/<repo>/issues?labels=laundry&state=open&per_page=100"`; the backlog lives in GitHub issues, see `docs/laundry_list.md`) to understand current state and priorities. If this session is part of the laundry-list chain, read `docs/laundry-chain.md` and run its start checks first.
 
 ---
 
 # Objective
 
-Deliver a complete Loop Vertical — a thematically cohesive group of items from `docs/laundry_list.md` — and leave it in a merge-ready state.
+Deliver a complete Loop Vertical — a thematically cohesive group of open `laundry` issues — and leave it in a merge-ready state.
 
-Optimize for the highest collective user/operator impact. Fan out to parallel agents for independent items within the vertical. If no items are clear, audit the codebase and populate `docs/laundry_list.md` with findings.
+Optimize for the highest collective user/operator impact. Fan out to parallel agents for independent items within the vertical. If no items are clear, audit the codebase and file the findings as `laundry` issues.
 
 ---
 
@@ -65,8 +65,7 @@ Before proposing work:
 1. Read:
    - `AGENTS.md`
    - `STATE.md`
-   - `docs/laundry_list.md`
-   - `docs/done_laundry_list.md`
+   - the open `laundry` issues (and the closed ones a candidate item touches)
 
 2. Refresh repository state:
    - `git pull origin <branch>`
@@ -200,12 +199,12 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 
 # Bookkeeping
 
-The laundry lists are the loop's memory; keep them truthful:
-- **Truth in the same change.** Any PR that changes reality updates the affected item's status in the same commit.
+The `laundry` issues are the loop's memory; keep them truthful:
+- **Truth in the same change.** Any PR that changes reality says so on the affected issue in the same session: a comment with the evidence, `Closes #N` in the PR body for finished items, labels for state (`in-progress`, `waiting-on-human`).
 - **Absolute dates only.** `yyyy-mm-dd`, never "yesterday" or "last week".
-- **Blocks move whole.** Move each completed item in full from `docs/laundry_list.md` to `docs/done_laundry_list.md`, adding the completion date and evidence. Never delete or duplicate an item; reopened items move back with context.
-- **New work gets a number.** Follow-up work becomes a new numbered item with priority, status and location — never a TODO in code, a side note or silent scope creep in an existing item. Never leave findings only in conversation.
-- **One home per kind of fact.** Active work in the laundry list, completed work in the done list, doctrine in `AGENTS.md`, technical detail in docs. Point, don't restate.
+- **Close with evidence.** A finished item is a closed issue whose last comment names the PR, the date and the verification; never delete an issue or file a duplicate; reopened work reopens the issue with a comment saying why.
+- **New work gets an issue.** Follow-up work becomes a new `laundry` issue with a `P0` to `P3` label, Problem, Acceptance, Validation and Risk — never a TODO in code, a side note or silent scope creep in an existing issue. Never leave findings only in conversation.
+- **One home per kind of fact.** Active work in open issues, completed work in closed issues, doctrine in `AGENTS.md`, technical detail in docs. Point, don't restate.
 - **Chain sessions** also update "Queue" and "Chain log" in `docs/laundry-chain.md`.
 
 ---

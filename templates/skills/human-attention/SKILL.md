@@ -8,7 +8,7 @@ description: Use the moment an item cannot move without the owner (a human-only 
 The human is not the loop's per-cycle prompter and not its fallback. They engineer the loop and answer real questions; they do not want a queue of chores. Three rules decide where a human-only need goes (owner decision 2026-10-24, replacing "every human-only need is an issue"):
 
 1. **Attended session: ask live.** When the owner is in the chat, ask with the structured question tool (AskUserQuestion): options first, one recommended with its reason, and the paste-ready text or the exact steps when the ask is an action. Record the answer the same session: in the laundry item, in `STATE.md`, and in `MEMORY.md` when it outlives the item. No issue is filed.
-2. **Unattended session: record and continue.** When nobody can answer (a scheduled run, a chain), take the reversible default when one exists and record it. Otherwise write the question into the item's Status line as `WAITING ON HUMAN — <yyyy-mm-dd>: <the one question, the options, the recommended one>`, add one line under "blockers" in `STATE.md`, leave that item open and finish the rest of the work. The daily changelog lists every `WAITING ON HUMAN` line under "Needs you"; the owner answers in the next attended session or in the intake channel, and the answer is written into the item with the marker removed. No issue is filed.
+2. **Unattended session: record and continue.** When nobody can answer (a scheduled run, a chain), take the reversible default when one exists and record it. Otherwise label the issue `waiting-on-human` and add one comment with the one question, the options and the recommended one, add one line under "blockers" in `STATE.md` when the whole goal is stuck, leave that issue open and finish the rest of the work. The daily changelog and the attention check's digest list every open `waiting-on-human` issue under "Needs you" and "Waiting on you"; the owner answers in a comment, in the next attended session or in the intake channel, and the answer is recorded as a comment with the label removed. No `human-action` issue is filed.
 3. **Critical: an issue.** Only a need that is human-only, has every alternative exhausted in writing, is critical and is not already open becomes a GitHub issue labelled `human-action` and `severity:critical`, filed in the repository it concerns (cross-repository ones in the control repository). The attention check tells the owner at its next run. One queue: `is:open label:human-action user:<owner>`.
 
 Never: an issue for a chore the owner could do in two minutes while they are in the chat; an issue for a question that is not critical; a direct notification to the owner from a filer. Only the attention check reaches the owner, and only for issues.
@@ -23,11 +23,11 @@ File an issue only when all five hold, and the issue says what the agent did ins
 
 1. **Human-only.** The need is on the Stay-the-Engineer list in `AGENTS.md`, or requires something only the owner has: credentials, accounts, money, a legal or contractual reading, the owner's identity (voice, name, face), or a decision the docs record as theirs.
 2. **Alternatives exhausted, in writing.** Each of these was tried or ruled out, and the issue says what happened: (a) the action itself, attempted, with the refusal quoted; (b) another approach inside the item; (c) a reversible safe default, taken and recorded instead of asked; (d) deferring the item and doing other backlog work; (e) a recorded decision in the docs, laundry lists, done lists or chain log that already answers it.
-3. **Critical.** Money, security, legal, public exposure, data loss, or every P0 item of the repository blocked. A P1 item or a vertical that cannot move is not critical: it is a `WAITING ON HUMAN` line.
+3. **Critical.** Money, security, legal, public exposure, data loss, or every P0 item of the repository blocked. A P1 item or a vertical that cannot move is not critical: it is a `waiting-on-human` label and comment.
 4. **Not already open.** No open `human-action` issue covers it. Search first; add to the existing issue instead of opening a second.
 5. **One ask.** The issue asks for exactly one decision or one action, with options and a recommendation. Bundled asks are split or dropped.
 
-If any condition fails: ask live when the owner is in the chat, otherwise record `WAITING ON HUMAN` in the item and `STATE.md`, leave the item open, finish the rest of the work. No issue, no notification.
+If any condition fails: ask live when the owner is in the chat, otherwise label the issue `waiting-on-human` with the question as a comment, leave it open, finish the rest of the work. No `human-action` issue, no notification.
 
 ## Severity
 
@@ -58,7 +58,7 @@ The prompt is `docs/attention-check.md`; the owner creates the scheduled task fr
 
 - For each `severity:critical` issue without an `attention-notified` comment in the last 24 hours: include it in the run's final summary (repository, title, link, the one ask) and comment `attention-notified <yyyy-mm-dd hh:mm UTC>` on it.
 - At the digest hour the prompt names, also include every `severity:blocking` issue without an `attention-digested` comment and comment `attention-digested <timestamp>` on each; list the other open blocking issues under "still waiting"; list open agent pull requests (`Chain ` and `chore: record human answer`) under "PRs waiting for your review"; and on Mondays append a roll-up of open `severity:question` issues (title and link), without commenting on those. These digest steps serve the issues filed before 2026-10-24 and go quiet as the queue empties.
-- For each `human-action` issue with a human comment newer than its last `attention-recorded` comment, or closed by the human without one: on a branch, record the answer in the laundry item and `STATE.md`, open a draft PR, comment `attention-recorded <timestamp>`, and close the issue if it is still open and the answer chose an option or said `done`. An attended session that records an answer itself leaves the same `attention-recorded` comment so the check does not record it twice.
+- For each `human-action` or `waiting-on-human` issue with a human comment newer than its last `attention-recorded` comment, or closed by the human without one: comment `attention-recorded <timestamp>: <the answer>` on the issue, remove the `waiting-on-human` label, close a `human-action` issue if it is still open and the answer chose an option or said `done`, and open the `attention/<n>` PR only when the answer is a standing decision that belongs in `STATE.md`. An attended session that records an answer itself leaves the same `attention-recorded` comment so the check does not record it twice.
 - For each recorded answer, name the chain scheduled task that picks it up at its next daily run. Routine sessions cannot fire other tasks (verified 2026-10-24), so the chain's schedule is the kick; schedule it an hour after the digest.
 - If nothing above applied, end with exactly: `Human attention: nothing to escalate.`
 
@@ -68,7 +68,7 @@ The final summary of a run that found something starts with `HUMAN ATTENTION:` a
 
 For a live question: the owner answers in the chat; the session writes the answer into the item, `STATE.md` and, when it outlives the item, `MEMORY.md`, in the same PR as the work.
 
-For a `WAITING ON HUMAN` line: the owner answers in the next attended session, or in the intake channel naming the repository and item; the session or the intake check writes the answer into the item's Status line with the date and removes the marker; the repository's next chain run picks it up (start check 5 in `docs/laundry-chain.md`).
+For a `waiting-on-human` issue: the owner answers in a comment on the issue, in the next attended session, or in the intake channel naming the repository and issue; the attention check, the session or the intake check comments the answer with the date and removes the label; the repository's next chain run reads it from the thread (start check 5 in `docs/laundry-chain.md`).
 
 For an issue:
 
@@ -83,7 +83,7 @@ Each repository that runs a chain has a scheduled task (`<repo>-chain`: daily, a
 
 | Thought | Reality |
 |---|---|
-| "I'll file an issue to be safe" | An issue is for critical only. The owner in the chat: ask now. Nobody answering: `WAITING ON HUMAN` in the item, continue. |
+| "I'll file an issue to be safe" | A `human-action` issue is for critical only. The owner in the chat: ask now. Nobody answering: label the issue `waiting-on-human`, comment the question, continue. |
 | "The owner is right here, but the rule says file" | The rule says ask. Options, a recommendation, the paste-ready text; then write the answer down. |
 | "Chat is not a record" | The chat is not; the answer written into the item, `STATE.md` or `MEMORY.md` the same session is. |
 | "Two small questions in one ask" | One ask per question or issue. Batch live questions into one structured call. |

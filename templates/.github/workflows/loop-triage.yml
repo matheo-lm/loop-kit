@@ -1,9 +1,9 @@
 name: loop-triage
 
-# Scheduled discovery: surfaces open laundry-list items as a recurring triage
-# issue so the loop has fresh input without human prompting.
+# Scheduled discovery: posts the open laundry issues as a recurring triage
+# digest so the loop has fresh input without human prompting.
 # Manual-only by default — uncomment the schedule block to enable the cron
-# once your laundry list is trustworthy.
+# once your backlog is trustworthy.
 on:
   workflow_dispatch:
   # schedule:
@@ -24,12 +24,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          open_items="$(grep -n '^- \[ \]' docs/laundry_list.md || true)"
+          open_items="$(gh api "repos/${GITHUB_REPOSITORY}/issues?labels=laundry&state=open&per_page=100" --jq '.[] | select(.pull_request == null) | "#\(.number) \(.title)"')"
           if [ -z "$open_items" ]; then
-            open_items="(none - populate docs/laundry_list.md)"
+            open_items="(none - file issues labelled laundry)"
           fi
-          title="loop-triage: open laundry list items"
-          body="$(printf 'Open items in docs/laundry_list.md as of %s:\n\n```\n%s\n```' "$(date -u +%F)" "$open_items")"
+          title="loop-triage: open laundry issues"
+          body="$(printf 'Open laundry issues as of %s:\n\n```\n%s\n```' "$(date -u +%F)" "$open_items")"
           existing="$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')"
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$body"

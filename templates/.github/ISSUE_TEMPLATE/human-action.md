@@ -1,6 +1,6 @@
 ---
 name: Human action
-about: A critical request for something only the human can give (money, security, legal, public exposure, data loss, every P0 blocked). File only when the bar in skills/human-attention/SKILL.md is met; anything else is asked live or recorded in the item as WAITING ON HUMAN.
+about: A critical request for something only the human can give (money, security, legal, public exposure, data loss, every P0 blocked). File only when the bar in skills/human-attention/SKILL.md is met; anything else is asked live or recorded on the issue with the waiting-on-human label.
 title: "[HUMAN] "
 labels: human-action
 ---
