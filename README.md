@@ -30,7 +30,7 @@ Loop-kit gives you the pieces, ready to drop in:
 | **Automations** | `.github/workflows/loop-triage.yml` | Scheduled discovery and triage without human prompting. |
 | **Worktrees** | `AGENTS.md` | Documented `git worktree` pattern for parallel agents. |
 | **Chains** | `docs/laundry-chain.md` | Multi-session runs: one bundle per session, PR title as lock, session limit, queue, chain log, hand-off to the next session. |
-| **Human attention** | `skills/human-attention/SKILL.md`, `.github/ISSUE_TEMPLATE/human-action.md`, `docs/attention-check.md` | A human-only need is asked live when the human is in the chat, recorded in the item as `WAITING ON HUMAN` when nobody can answer, and filed as a `human-action` issue only when it is critical and meets a five-point bar. A scheduled check carries critical issues to the human with rate limits; answers come back as recorded decisions. |
+| **Human attention** | `skills/human-attention/SKILL.md`, `.github/ISSUE_TEMPLATE/human-action.md`, `docs/attention-check.md` | A human-only need is asked live when the human is in the chat, recorded on the issue with the `waiting-on-human` label when nobody can answer, and filed as a `human-action` issue only when it is critical and meets a five-point bar. A scheduled check carries critical issues to the human with rate limits; answers come back as recorded decisions. |
 | **Intake** | `skills/intake/SKILL.md`, `docs/intake.md` | The human dumps thoughts, bugs, ideas and feedback in one private Slack channel; a scheduled check turns each message into a laundry item in the right repository after a gap analysis, asks in the thread when the ask is unclear, and never does the work. |
 
 ### One control repository for many

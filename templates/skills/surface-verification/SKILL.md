@@ -90,5 +90,5 @@ DOESN'T costs one more look.
 
 Observations beyond the verdict are the signal: anything that made you
 pause, work around, or go "huh" is information the author doesn't have.
-Surprises found while observing become laundry-list items, not silent
+Surprises found while observing become `laundry` issues, not silent
 fixes.

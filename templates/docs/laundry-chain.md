@@ -15,7 +15,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 1. **One chain session at a time.** List open pull requests. If any open PR's title starts with `Chain `, another chain session is still working or waiting to merge. Stop, and report that PR and its state. Exception (human, 2026-10-24): if that PR's head commit is more than 3 hours old, the session that held it is dead (a run can die mid-bundle on the account's usage limit); check out its branch, continue its bundle and keep the PR as the lock, noting the adoption in the PR body and the Chain log.
 2. **Session number.** N is the highest session number in "Chain log" plus 1. If N is above <limit> (the human raises this number to continue), stop and post the final report (see Hand-off).
 3. **Queue.** If "Queue" holds no agent-doable bundle, stop and post the final report.
-4. **Title.** Name the branch's PR `Chain N/<limit> — <theme> (<items>)`. The PR title is the lock that check 1 reads, so open the draft PR as soon as the branch has its first commit.
+4. **Title.** Name the branch's PR `Chain N/<limit> — <theme> (#<n>, #<m>)`. The PR title is the lock that check 1 reads, so open the draft PR as soon as the branch has its first commit.
 5. **Human answers first.** Open `human-action` or `waiting-on-human` issues with a human reply newer than their last `attention-recorded` comment: record the answer per `skills/human-attention/SKILL.md` (a comment, the label removed) before taking a bundle. Skip any bundle blocked on an open `human-action` issue or an unanswered `waiting-on-human` question.
 
 ## Working agreement (<human>, <yyyy-mm-dd>)
@@ -43,7 +43,7 @@ The session runs the start checks below, takes the first bundle under "Queue" an
 ## Hand-off
 
 - **Pick the next bundle.** ONE bundle of 2–5 related open `laundry` issues that agents can finish. Exclude `waiting-on-human`, `human-action`, on-hold and design-first issues and issues owned by another open PR. Prefer coherent themes and higher priority (`P0` first).
-- **If such work remains and N is below <limit>:** a scheduled run does not spawn; the schedule starts the next session (routine-fired sessions have no `create_session` or `list_sessions`). A session started by hand may start the next one with `create_session` (this repository as source, title `Chain N+1/<limit> — <theme> (<items>)`, the one-line prompt above); if that is refused (for example, a nesting limit), the queue is already up to date: end with the one-line prompt for the human.
+- **If such work remains and N is below <limit>:** a scheduled run does not spawn; the schedule starts the next session (routine-fired sessions have no `create_session` or `list_sessions`). A session started by hand may start the next one with `create_session` (this repository as source, title `Chain N+1/<limit> — <theme> (#<n>, #<m>)`, the one-line prompt above); if that is refused (for example, a nesting limit), the queue is already up to date: end with the one-line prompt for the human.
 - **Otherwise:** do not spawn. Post a final report listing what is left and why, each with the one thing the human must do. If an item is critical by the bar in `skills/human-attention/SKILL.md`, file the `human-action` issue and the attention check carries it from there; otherwise its `waiting-on-human` label and comment are the record.
 - **Last message:** the next session's title and ID, or the final report.
 

@@ -24,7 +24,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          open_items="$(gh api "repos/${GITHUB_REPOSITORY}/issues?labels=laundry&state=open&per_page=100" --jq '.[] | "#\(.number) \(.title)"' || true)"
+          open_items="$(gh api "repos/${GITHUB_REPOSITORY}/issues?labels=laundry&state=open&per_page=100" --jq '.[] | select(.pull_request == null) | "#\(.number) \(.title)"')"
           if [ -z "$open_items" ]; then
             open_items="(none - file issues labelled laundry)"
           fi

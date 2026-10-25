@@ -28,11 +28,11 @@ Kinds, decided per message:
 2. **What exists.** Read that repository's `laundry` issues (open and closed), `STATE.md`, and the code or docs the message touches. State in one or two sentences what is there today.
 3. **What was asked.** Restate the ask in one sentence in the agent's own words.
 4. **The gap.** The difference between 2 and 3, as the issue's Problem line. If there is no gap (it already exists or is already an open issue), say so in the thread and comment on the existing issue instead of filing a new one.
-5. **Scope and risk.** What the item must not touch (the repository's off-limits list), and whether any part is the human's alone (then the chain records that part as `WAITING ON HUMAN` or, if critical, files a `human-action` issue; not intake's job).
+5. **Scope and risk.** What the item must not touch (the repository's off-limits list), and whether any part is the human's alone (then the chain labels the issue `waiting-on-human` or, if critical, files a `human-action` issue; not intake's job).
 
 ## The item bar
 
-An issue is filed only when all of these are written: a Problem (the gap), an Acceptance line a checker could verify, a Validation line (the command or observation), a Risk line, the area, a priority, and a **Source** line holding the Slack permalink and the human's words verbatim. The item matches the format of the existing items in that repository's laundry file exactly (numbering, headings, labels); never a new format.
+An issue is filed only when all of these are written: a Problem (the gap), an Acceptance line a checker could verify, a Validation line (the command or observation), a Risk line, the area, a priority, and a **Source** line holding the Slack permalink and the human's words verbatim. The body uses the headings Problem, Acceptance, Validation, Risk and Source; the labels are those `docs/laundry_list.md` names.
 
 ## The thread protocol
 
