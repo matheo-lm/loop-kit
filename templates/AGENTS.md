@@ -96,7 +96,7 @@ To work through the backlog across many sessions without prompting each one, run
 Follow the phased operating loop in `SESSION.md` — it is the canonical session protocol.
 
 In summary:
-1. **Pre-flight**: Check open PRs (QA; merge only with approval), prune merged worktrees, sync `<default-branch>`.
+1. **Pre-flight**: Check open PRs (QA; a clean, reviewed PR merges itself), prune merged worktrees, sync `<default-branch>`.
 2. **Start**: Read `STATE.md` and the open `laundry` issues.
 3. **Phase 1-3**: Gather evidence, build vertical candidates, commit to a vertical (Frame gate).
 4. **Phase 4-5**: Implement (fan out agents for independent items), verify, review, evaluate.
