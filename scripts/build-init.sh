@@ -125,7 +125,7 @@ echo ""
 echo "The loop is ready. Next session:"
 echo "  1. Give SESSION.md to your agent as the session-start prompt"
 echo "  2. The agent reads STATE.md + the open laundry issues and runs the operating loop"
-echo "  3. The agent ships a PR with verification evidence — the human reviews it (Ship gate)"
+echo "  3. The agent ships a PR with verification evidence — an independent agent reviews it and it merges itself when the checks are green (Ship gate)"
 FTR
 } > scripts/loop-init.sh
 

@@ -1,6 +1,6 @@
 # "go" / "loop" — what this trigger activates
 
-When a human says "go" or "loop", run this full protocol from Phase 0 through Ship without interruption. No confirmation between phases. The two human gates (Frame and Ship) are the only stops.
+When a human says "go" or "loop", run this full protocol from Phase 0 through Ship without interruption. No confirmation between phases. The Frame gate is the only stop; the Ship gate is passed by an independent review, not by the human.
 
 ---
 
@@ -24,8 +24,10 @@ Optimize for the highest collective user/operator impact. Fan out to parallel ag
 
 The human engineers the loop; the loop runs the work. The human is involved at exactly two points:
 
+The human never reviews code or pull requests: review is done by an independent agent (maker ≠ checker, see "Review"), or by the agent itself re-reading the full diff cold when no sub-agent is available.
+
 1. **Frame gate** (end of Phase 3) — if the selected vertical is ambiguous, has multiple valid interpretations, or any item touches the STOP list, ask before writing code. Questions before work are cheap; questions after mistakes are expensive.
-2. **Ship gate** (the PR) — the human reviews finished, verified work with evidence attached.
+2. **Ship gate** (the PR) — finished, verified work with evidence attached, reviewed by an independent agent whose findings are fixed; the PR then merges itself under the conditions in "Non-Negotiable Rules". The human is asked only for an owner-only decision (STOP list, `AGENTS.md` "Stay the Engineer"), live or recorded per `skills/human-attention/SKILL.md`.
 
 Between the gates, run to completion. Do not stop to ask "shall I proceed?", present intermediate artifacts for sign-off, request permission between phases, or volunteer "want me to fix these?" after completing a task. Once framing is settled, it converts into acceptance criteria and the loop runs autonomously through implement → verify → ship. The only legitimate mid-loop stop is being blocked on input only the human has.
 
@@ -42,7 +44,7 @@ Before picking new work, clean up anything in-flight and sync the repo.
 ### 1. Open PRs
 Run `gh pr list` (or equivalent). For each open PR:
 - Check out the branch, run the project's validation suite (typecheck, lint, tests).
-- If clean: report it as ready for approval. Merge only with explicit approval (see Non-Negotiable Rules).
+- If clean: it merges under the conditions in Non-Negotiable Rules once an independent review's findings are fixed; no approval is asked.
 - If failing: add a laundry item capturing the failure, leave the PR open, continue.
 
 ### 2. Open worktrees
@@ -190,7 +192,7 @@ If not satisfied, revise and re-verify. If blocked, update `STATE.md` blockers a
 # Non-Negotiable Rules
 
 - Never commit directly to `<default-branch>`. Use a feature branch.
-- Never merge without approval. The only exception is a chain session whose `docs/laundry-chain.md` working agreement records the human's autonomous-merge decision, and only under its conditions.
+- Never merge without an independent review. A PR merges itself (squash) when the project's checks are green, the default branch is merged in with no conflict, the independent review's findings are fixed, the PR body carries the evidence, and the diff touches nothing under `.github/workflows/`; otherwise it stays a draft and its body says why. Never merge a failing or conflicted PR.
 - Follow `AGENTS.md` operating principles (think, simplicity, surgical, goal-driven) and project conventions.
 - No refactoring beyond what the selected vertical requires.
 - When modifying API behavior, update `.env.example`, docs, and README.
@@ -218,7 +220,7 @@ Open a pull request (the Ship gate):
 - If anything failed or was skipped, say so plainly.
 - Chain sessions title the PR `Chain N/<limit> — <theme> (<items>)` and open it as a draft at the first commit.
 
-The human reviews the finished PR, not intermediate artifacts.
+The independent review is the gate; the human reads merged work afterward, never as a step before the merge.
 
 ---
 

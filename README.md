@@ -209,10 +209,10 @@ SESSION.md → AGENTS.md → STATE.md + laundry issues → gather evidence → b
 commit to one → implement → verify → review → bookkeep → ship PR → loop
 ```
 
-The human is involved at exactly two gates:
+The loop has exactly two gates:
 
-1. **Frame** — before code, the agent asks if the item is ambiguous or touches the STOP list (payments, auth, data deletion, irreversible public behavior).
-2. **Ship** — the PR, with verification evidence (commands + output) in the body.
+1. **Frame** — before code, the agent asks the human if the item is ambiguous or touches the STOP list (payments, auth, data deletion, irreversible public behavior).
+2. **Ship** — the PR, with verification evidence (commands + output) in the body, reviewed by an independent agent whose findings are fixed; the PR then merges itself under the repository's merge conditions. The human never reviews code or pull requests and is asked only for owner-only decisions.
 
 Between the gates, the agent runs to completion — no "shall I proceed?", no intermediate sign-offs. Everything else — planning, implementation, verification, review, bookkeeping, looping — is the agent's part.
 
