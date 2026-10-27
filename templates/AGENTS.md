@@ -67,7 +67,7 @@ Pieces 6 and 7 are cross-repository: when several repositories share one human, 
 
 ### The Two Human Gates
 
-The human engineers the loop, not its per-cycle prompter. Exactly two gates: **Frame** (clarifying questions before code, when ambiguous or on the STOP list) and **Ship** (the PR, with verification evidence). Between them, run to completion — `SESSION.md` defines both gates.
+The human engineers the loop, not its per-cycle prompter. Exactly two gates: **Frame** (clarifying questions before code, when ambiguous or on the STOP list) and **Ship** (the PR, with verification evidence, reviewed by an independent agent and merged by the session; the human never reviews code or pull requests). Between them, run to completion — `SESSION.md` defines both gates.
 
 ### Stay the Engineer (human-only decisions)
 
